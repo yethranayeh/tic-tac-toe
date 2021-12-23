@@ -7,6 +7,32 @@
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>Tic-Tac-Toe</title>
+		<link rel="stylesheet" href="style.css" />
+		<!-- Google Font -->
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Oooh+Baby&family=Play:wght@400;700&display=swap"
+			rel="stylesheet"
+		/>
 	</head>
-	<body></body>
+	<body>
+		<div class="container">
+			<div class="player-info disable-select">
+				<span id="player">Player</span>
+				<span>vs</span>
+				<span id="opponent">Computer</span>
+				<form action="">
+					<input type="radio" name="gameMode" id="pvpc" />
+					<label for="pvpc">Player vs Computer</label>
+					<input type="radio" name="gameMode" id="pvp" />
+					<label for="pvp">Player vs Player</label>
+				</form>
+			</div>
+		</div>
+		<div class="container">
+			<div class="game-board disable-select"></div>
+		</div>
+		<script src="script.js"></script>
+	</body>
 </html>
