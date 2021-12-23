@@ -43,8 +43,8 @@ body {
 	display: flex;
 	flex-wrap: wrap;
 	color: var(--tictactoe-color);
-	/* text-align: center; */
 	font-size: 32px;
+	cursor: pointer;
 }
 
 .game-box {
@@ -54,12 +54,11 @@ body {
 	align-items: center;
 	border-bottom: 1px solid var(--secondary-color);
 	border-right: 1px solid var(--secondary-color);
-	cursor: pointer;
 	transition: background-color 100ms ease-in;
 }
 
 .game-box:hover {
-	background-color: var(--secondary-color);
+	background-color: var(--light-color);
 }
 
 .game-box:nth-child(7),
@@ -82,10 +81,20 @@ body {
 	margin: 0;
 }
 
+/* Visibility */
+.d-none {
+	display: none;
+}
+
 /* Disable Selection */
 .disable-select {
 	-webkit-user-select: none;
 	-moz-user-select: none;
 	-ms-user-select: none;
 	user-select: none;
+}
+
+/* Disabled */
+.disabled {
+	cursor: not-allowed;
 }

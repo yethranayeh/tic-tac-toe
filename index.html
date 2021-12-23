@@ -19,9 +19,14 @@
 	<body>
 		<div class="container">
 			<div class="player-info disable-select">
-				<span id="player">Player</span>
-				<span>vs</span>
-				<span id="opponent">Computer</span>
+				<div class="game-state">
+					<p>Please choose a game mode</p>
+				</div>
+				<div class="game-state d-none">
+					<span id="player">Player</span>
+					<span>vs</span>
+					<span id="opponent">Computer</span>
+				</div>
 				<form action="">
 					<input type="radio" name="gameMode" id="pvpc" autocomplete="off" />
 					<label for="pvpc">Player vs Computer</label>
@@ -31,7 +36,7 @@
 			</div>
 		</div>
 		<div class="container">
-			<div class="game-board disable-select"></div>
+			<div class="game-board disable-select disabled"></div>
 		</div>
 		<script src="script.js"></script>
 	</body>

@@ -29,6 +29,7 @@ const events = {
 const gameBoard = {
 	init: function () {
 		this.board = this.createBoard();
+		this.DOM = document.querySelector(".game-board");
 	},
 	createBoard: function () {
 		let board = [];
@@ -43,7 +44,8 @@ gameBoard.init();
 // Display Controller Module
 const displayController = {
 	init: function () {
-		this.board = document.querySelector(".game-board");
+		this.gameStates = document.querySelectorAll(".game-state");
+		this.inputForm = document.querySelector("form");
 		this.displayBoard();
 	},
 	displayBoard: function () {
@@ -53,9 +55,9 @@ const displayController = {
 			let gameBoxContent = document.createElement("p");
 			gameBoxContent.textContent = content ? content : "";
 			gameBox.appendChild(gameBoxContent);
-			this.board.appendChild(gameBox);
+			gameBoard.DOM.appendChild(gameBox);
 		});
-		this.boxes = this.board.querySelectorAll(".game-box");
+		this.boxes = gameBoard.DOM.querySelectorAll(".game-box");
 		console.log(this.boxes);
 	},
 	displayPlayer: function (player) {
@@ -64,8 +66,20 @@ const displayController = {
 	displayOpponent: function (opponent) {
 		playerInfo.opponent.textContent = opponent ? opponent.playerName : "Computer";
 	},
-	setPlayerInput: function () {
-		return;
+	getPlayerInput: function (input) {
+		if (input === "pvp" || input === "pvpc") {
+			gameBoard.DOM.classList.remove("disabled");
+			this.toggleDisplayState();
+		} else if (input === "newGame") {
+			gameBoard.DOM.classList.add("disabled");
+			this.toggleDisplayState();
+		}
+	},
+	toggleDisplayState: function () {
+		this.gameStates.forEach((state) => {
+			state.classList.toggle("d-none");
+		});
+		this.inputForm.classList.toggle("d-none");
 	}
 };
 displayController.init();
@@ -88,6 +102,7 @@ const playerInfo = {
 			var player = playerFactory(prompt("Player Name:"));
 			var opponent = playerFactory("Computer");
 		}
+		displayController.getPlayerInput(input);
 		displayController.displayPlayer(player);
 		displayController.displayOpponent(opponent);
 	},
@@ -105,7 +120,3 @@ playerInfo.init();
 const playerFactory = (playerName) => {
 	return { playerName };
 };
-
-// const player = playerFactory("James");
-// displayController.displayPlayer(player);
-// displayController.displayOpponent();
