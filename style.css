@@ -6,6 +6,7 @@
 	--secondary-color: #403d39;
 	--light-color: #ccc5b9;
 	--tictactoe-color: #eb5e28;
+	--font-family: "Play", sans-serif;
 }
 
 *,
@@ -25,7 +26,7 @@ body {
 
 .player-info {
 	margin: 20px 0 40px;
-	font-family: "Play", sans-serif;
+	font-family: var(--font-family);
 	font-weight: 400;
 	text-align: center;
 }
@@ -48,6 +49,8 @@ body {
 }
 
 .game-box {
+	min-width: 50px;
+	min-height: 100px;
 	flex: 0 0 33.333333%;
 	display: flex;
 	justify-content: center;
@@ -79,6 +82,21 @@ body {
 	text-shadow: 1px 1px 5px var(--primary-color);
 	padding: 0;
 	margin: 0;
+}
+
+.new-game {
+	padding: 10px 15px;
+	margin-top: 40px;
+	border: 1px solid var(--secondary-color);
+	color: var(--primary-color);
+	font-family: var(--font-family);
+	transition: color 100ms ease-in, background-color 100ms ease-in, transform 150ms ease;
+}
+
+.new-game:hover {
+	background-color: var(--secondary-color);
+	color: var(--bg);
+	transform: translateY(-3px);
 }
 
 /* Visibility */

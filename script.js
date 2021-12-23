@@ -30,6 +30,8 @@ const gameBoard = {
 	init: function () {
 		this.board = this.createBoard();
 		this.DOM = document.querySelector(".game-board");
+		this.boxes = this.createBoxes();
+		this.publishEvents();
 	},
 	createBoard: function () {
 		let board = [];
@@ -37,6 +39,22 @@ const gameBoard = {
 			board.push(false);
 		}
 		return board;
+	},
+	createBoxes: function () {
+		let boxes = [];
+		this.board.forEach((content) => {
+			let gameBox = document.createElement("div");
+			gameBox.classList.add("game-box");
+			boxes.push(gameBox);
+		});
+		return boxes;
+	},
+	publishEvents: function () {
+		this.boxes.forEach((box) => {
+			box.addEventListener("click", function (e) {
+				displayController.displayBoxInput(e.target);
+			});
+		});
 	}
 };
 gameBoard.init();
@@ -46,19 +64,29 @@ const displayController = {
 	init: function () {
 		this.gameStates = document.querySelectorAll(".game-state");
 		this.inputForm = document.querySelector("form");
-		this.displayBoard();
+		this.initializeBoard();
+		events.on("newGameClicked", this.clearBoard.bind(this));
+		events.on("newGameClicked", this.toggleDisplayState.bind(this));
+		events.on("newGameClicked", this.makeBoardAvailable.bind(this));
 	},
-	displayBoard: function () {
-		gameBoard.board.forEach((content) => {
-			let gameBox = document.createElement("div");
-			gameBox.classList.add("game-box");
-			let gameBoxContent = document.createElement("p");
-			gameBoxContent.textContent = content ? content : "";
-			gameBox.appendChild(gameBoxContent);
-			gameBoard.DOM.appendChild(gameBox);
-		});
-		this.boxes = gameBoard.DOM.querySelectorAll(".game-box");
-		console.log(this.boxes);
+	initializeBoard: function () {
+		for (let box of gameBoard.boxes) {
+			gameBoard.DOM.appendChild(box);
+		}
+	},
+	clearBoard: function () {
+		for (let box of gameBoard.boxes) {
+			if (box.lastChild) {
+				box.removeChild(box.lastChild);
+			}
+		}
+	},
+	displayBoxInput: function (target) {
+		if (!target.parentNode.classList.contains("disabled")) {
+			let boxContent = document.createElement("p");
+			boxContent.textContent = "x";
+			target.appendChild(boxContent);
+		}
 	},
 	displayPlayer: function (player) {
 		playerInfo.player.textContent = player.playerName;
@@ -68,10 +96,10 @@ const displayController = {
 	},
 	getPlayerInput: function (input) {
 		if (input === "pvp" || input === "pvpc") {
-			gameBoard.DOM.classList.remove("disabled");
+			this.makeBoardAvailable(true);
 			this.toggleDisplayState();
 		} else if (input === "newGame") {
-			gameBoard.DOM.classList.add("disabled");
+			this.makeBoardAvailable(false);
 			this.toggleDisplayState();
 		}
 	},
@@ -80,6 +108,16 @@ const displayController = {
 			state.classList.toggle("d-none");
 		});
 		this.inputForm.classList.toggle("d-none");
+		this.inputForm.querySelectorAll("input").forEach((input) => {
+			input.checked = false;
+		});
+	},
+	makeBoardAvailable: function (bool) {
+		if (bool === true) {
+			gameBoard.DOM.classList.remove("disabled");
+		} else {
+			gameBoard.DOM.classList.add("disabled");
+		}
 	}
 };
 displayController.init();
@@ -91,8 +129,8 @@ const playerInfo = {
 		this.player = this.DOM.querySelector("#player");
 		this.opponent = this.DOM.querySelector("#opponent");
 		this.gameModeInputs = this.DOM.querySelectorAll("input");
-		events.on("gameModeChanged", this.gameModeHandler.bind(this));
 		this.publishEvents();
+		events.on("gameModeChanged", this.gameModeHandler.bind(this));
 	},
 	gameModeHandler: function (input) {
 		if (input === "pvp") {
@@ -115,6 +153,19 @@ const playerInfo = {
 	}
 };
 playerInfo.init();
+
+const buttons = {
+	init: function () {
+		this.publishEvents();
+	},
+	newGame: document.querySelector("#newGame"),
+	publishEvents: function () {
+		this.newGame.addEventListener("click", function (e) {
+			events.emit("newGameClicked", e.target.id);
+		});
+	}
+};
+buttons.init();
 
 // Player Factory
 const playerFactory = (playerName) => {
