@@ -24,9 +24,10 @@ body {
 }
 
 .player-info {
-	margin: 20px 0;
+	margin: 20px 0 40px;
 	font-family: "Play", sans-serif;
 	font-weight: 400;
+	text-align: center;
 }
 
 .player-info span {
