@@ -1,6 +1,4 @@
 /** @format */
-// BUG: Clicking on an already played box still registers as a "playerPlayed" event, which triggers a random response from computer.
-// As the click happens on an already played box, the content does not change. However, the gameBoard.currentSymbol changes, so the computer plays an "x"
 
 // PubSub by learncodeacademy
 const events = {
@@ -98,6 +96,8 @@ const displayController = {
 	displayBoxInput: function (target) {
 		// console.log("Current ID of Box:", gameBoard.board[target.id]);
 		if (!target.parentNode.classList.contains("disabled") && !target.textContent) {
+			console.log("Target is empty box:", target.textContent);
+			console.log("Switching turn");
 			target.textContent = gameBoard.currentSymbol;
 			// Adjust board array with turns played
 			gameBoard.board[target.id] = gameBoard.currentSymbol;
@@ -197,17 +197,22 @@ const computer = {
 		events.on("playerPlayed", this.playTurn.bind(this));
 	},
 	playTurn: function () {
-		let randomBox = gameBoard.boxes[Math.floor(Math.random() * gameBoard.boxes.length)];
-		while (
-			!gameBoard.board.every((box) => {
-				// checks gameBoard.board to see that NOT every index has value. If all elements have truthy values, does not run
-				return box;
-			}) &&
-			randomBox.textContent // checks if target node has textContent. If it does, randomly chooses another node
-		) {
-			randomBox = gameBoard.boxes[Math.floor(Math.random() * gameBoard.boxes.length)];
+		// Only play turn if the symbol to be played is "o".
+		// The if condition is a "bandaid" for the bug where player clicking on an already played box still gives the turn to computer, instead of playing for the next player input.
+		// As a result, you could click on, for example, the first box and the computer would play "x" or "o" symbols on empty boxes on each click.
+		if (gameBoard.currentSymbol === "o") {
+			let randomBox = gameBoard.boxes[Math.floor(Math.random() * gameBoard.boxes.length)];
+			while (
+				!gameBoard.board.every((box) => {
+					// checks gameBoard.board to see that NOT every index has value. If all elements have truthy values, does not run
+					return box;
+				}) &&
+				randomBox.textContent // checks if target node has textContent. If it does, randomly chooses another node
+			) {
+				randomBox = gameBoard.boxes[Math.floor(Math.random() * gameBoard.boxes.length)];
+			}
+			displayController.displayBoxInput(randomBox); // Sends automated and randomized computer input to display controller
 		}
-		displayController.displayBoxInput(randomBox); // Sends automated and randomized computer input to display controller
 	}
 };
 
