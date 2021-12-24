@@ -31,7 +31,28 @@ body {
 	text-align: center;
 }
 
-.player-info span {
+.game-state p {
+	font-size: 24px;
+}
+
+.game-state .fading-arrows {
+	animation-name: fadingAnimation;
+	animation-duration: 1300ms;
+	animation-fill-mode: backwards;
+	animation-iteration-count: infinite;
+	animation-direction: alternate;
+}
+
+@keyframes fadingAnimation {
+	from {
+		opacity: 100%;
+	}
+	to {
+		opacity: 0;
+	}
+}
+
+.game-state span {
 	font-size: 32px;
 	font-weight: 700;
 }
