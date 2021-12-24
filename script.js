@@ -1,4 +1,5 @@
 /** @format */
+// BUG: Choosing to play at least once against computer initializes AI, which interferes with PvP mode as the computer keeps listening for "playerPlayed" events
 
 // PubSub by learncodeacademy
 const events = {
@@ -35,6 +36,17 @@ const gameBoard = {
 		this.gameMode = undefined;
 		this.currentSymbol = "x";
 		this.publishEvents();
+		events.on("turnSwitched", this.checkGameState.bind(this));
+		events.on("newGameClicked", this.startFresh.bind(this));
+		// events.on(
+		// 	"newGameClicked",
+		// 	function () {
+		// 		console.log("New game clickd. This called:", this);
+		// 		console.log("Current state of board:", this.board);
+		// 		this.board = this.createBoard();
+		// 		console.log("New state of board:", this.board);
+		// 	}.bind(this)
+		// );
 	},
 	createBoard: function () {
 		let board = [];
@@ -63,10 +75,82 @@ const gameBoard = {
 			});
 		});
 	},
+	startFresh: function () {
+		this.board = this.createBoard();
+		this.gameMode = undefined;
+		this.currentSymbol = "x";
+	},
 	switchTurn: function () {
 		// console.log(this.currentSymbol, "played...");
 		this.currentSymbol = this.currentSymbol === "x" ? "o" : "x";
 		// console.log("Next turn:", this.currentSymbol);
+		events.emit("turnSwitched");
+	},
+	rows: [
+		[0, 1, 2],
+		[3, 4, 5],
+		[6, 7, 8]
+	],
+	columns: [
+		[0, 3, 6],
+		[1, 4, 5],
+		[2, 5, 8]
+	],
+	diagonals: [
+		[0, 4, 8],
+		[2, 4, 6]
+	],
+	hasWinningPattern: function (arr) {
+		// console.log("Checking array:", arr);
+		// Check for winning pattern
+		for (let element of arr) {
+			console.log(`%cChecking element: [${element}]`, "color: yellow; text-decoration: underline;");
+			let x = 0;
+			let o = 0;
+			element.forEach((index) => {
+				if (this.board[index] === "x") {
+					x++;
+				} else if (this.board[index] === "o") {
+					o++;
+				}
+			});
+			console.log(`%cResults: x(${x}) vs o(${o})`, "color: lightgreen; text-decoration: underline");
+			if (x === 3) {
+				return "x";
+			} else if (o === 3) {
+				return "o";
+			}
+		}
+		return false;
+	},
+	checkGameState: function () {
+		if (
+			this.board.every((n) => {
+				return n === "x" || n === "o";
+			})
+		) {
+			console.error("Game over. Board is full.");
+		} else {
+			if (
+				// If the board has 3 of "x" as it will be the first to reach 3, to check for a winning pattern
+				this.board.filter((n) => {
+					return n === "x";
+				}).length >= 3
+			) {
+				if (this.hasWinningPattern(this.rows)) {
+					console.warn(this.hasWinningPattern(this.rows), "wins");
+					events.emit("gameOver");
+				} else if (this.hasWinningPattern(this.columns)) {
+					console.warn(this.hasWinningPattern(this.columns), "wins");
+					events.emit("gameOver");
+				} else if (this.hasWinningPattern(this.diagonals)) {
+					console.warn(this.hasWinningPattern(this.diagonals), "wins");
+					events.emit("gameOver");
+				} else {
+					console.info("No winning pattern yet...");
+				}
+			}
+		}
 	}
 };
 gameBoard.init();
@@ -78,8 +162,15 @@ const displayController = {
 		this.inputForm = document.querySelector("form");
 		this.initializeBoard();
 		events.on("newGameClicked", this.clearBoard.bind(this));
-		events.on("newGameClicked", this.toggleDisplayState.bind(this));
+		events.on("newGameClicked", this.toggleInfoDisplayState.bind(this));
 		events.on("newGameClicked", this.makeBoardAvailable.bind(this));
+		events.on("gameOver", this.makeBoardAvailable.bind(this));
+		events.on(
+			"gameOver",
+			function () {
+				this.toggleButtonDisplayState(buttons.newGame);
+			}.bind(this)
+		);
 	},
 	initializeBoard: function () {
 		for (let box of gameBoard.boxes) {
@@ -92,12 +183,14 @@ const displayController = {
 				box.removeChild(box.lastChild);
 			}
 		}
+		this.toggleButtonDisplayState(buttons.newGame);
+		this.makeBoardAvailable(true);
 	},
 	displayBoxInput: function (target) {
 		// console.log("Current ID of Box:", gameBoard.board[target.id]);
 		if (!target.parentNode.classList.contains("disabled") && !target.textContent) {
-			console.log("Target is empty box:", target.textContent);
-			console.log("Switching turn");
+			// console.log("Target is empty box:", target.textContent);
+			// console.log("Switching turn");
 			target.textContent = gameBoard.currentSymbol;
 			// Adjust board array with turns played
 			gameBoard.board[target.id] = gameBoard.currentSymbol;
@@ -114,13 +207,13 @@ const displayController = {
 	getPlayerInput: function (input) {
 		if (input === "pvp" || input === "pvpc") {
 			this.makeBoardAvailable(true);
-			this.toggleDisplayState();
+			this.toggleInfoDisplayState();
 		} else if (input === "newGame") {
 			this.makeBoardAvailable(false);
-			this.toggleDisplayState();
+			this.toggleInfoDisplayState();
 		}
 	},
-	toggleDisplayState: function () {
+	toggleInfoDisplayState: function () {
 		this.gameStates.forEach((state) => {
 			state.classList.toggle("d-none");
 		});
@@ -128,9 +221,12 @@ const displayController = {
 		this.inputForm.querySelectorAll("input").forEach((input) => {
 			input.checked = false;
 		});
-		buttons.newGame.classList.add("d-none");
+	},
+	toggleButtonDisplayState: function (button) {
+		button.classList.toggle("d-none");
 	},
 	makeBoardAvailable: function (bool) {
+		console.log("makeboardavailable called");
 		if (bool === true) {
 			gameBoard.DOM.classList.remove("disabled");
 		} else {
