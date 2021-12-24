@@ -1,5 +1,5 @@
 /** @format */
-// BUG: Choosing to play at least once against computer initializes AI, which interferes with PvP mode as the computer keeps listening for "playerPlayed" events
+// TODO: Add logic for Draw condition. Currently there is a check in place for if the board is full, but it also fires when there's a winning pattern
 
 // PubSub by learncodeacademy
 const events = {
@@ -38,15 +38,6 @@ const gameBoard = {
 		this.publishEvents();
 		events.on("turnSwitched", this.checkGameState.bind(this));
 		events.on("newGameClicked", this.startFresh.bind(this));
-		// events.on(
-		// 	"newGameClicked",
-		// 	function () {
-		// 		console.log("New game clickd. This called:", this);
-		// 		console.log("Current state of board:", this.board);
-		// 		this.board = this.createBoard();
-		// 		console.log("New state of board:", this.board);
-		// 	}.bind(this)
-		// );
 	},
 	createBoard: function () {
 		let board = [];
@@ -81,9 +72,7 @@ const gameBoard = {
 		this.currentSymbol = "x";
 	},
 	switchTurn: function () {
-		// console.log(this.currentSymbol, "played...");
 		this.currentSymbol = this.currentSymbol === "x" ? "o" : "x";
-		// console.log("Next turn:", this.currentSymbol);
 		events.emit("turnSwitched");
 	},
 	rows: [
@@ -93,7 +82,7 @@ const gameBoard = {
 	],
 	columns: [
 		[0, 3, 6],
-		[1, 4, 5],
+		[1, 4, 7],
 		[2, 5, 8]
 	],
 	diagonals: [
@@ -101,10 +90,9 @@ const gameBoard = {
 		[2, 4, 6]
 	],
 	hasWinningPattern: function (arr) {
-		// console.log("Checking array:", arr);
 		// Check for winning pattern
 		for (let element of arr) {
-			console.log(`%cChecking element: [${element}]`, "color: yellow; text-decoration: underline;");
+			// console.log(`%cChecking element: [${element}]`, "color: yellow; text-decoration: underline;");
 			let x = 0;
 			let o = 0;
 			element.forEach((index) => {
@@ -114,7 +102,7 @@ const gameBoard = {
 					o++;
 				}
 			});
-			console.log(`%cResults: x(${x}) vs o(${o})`, "color: lightgreen; text-decoration: underline");
+			// console.log(`%cResults: x(${x}) vs o(${o})`, "color: lightgreen; text-decoration: underline");
 			if (x === 3) {
 				return "x";
 			} else if (o === 3) {
@@ -129,7 +117,9 @@ const gameBoard = {
 				return n === "x" || n === "o";
 			})
 		) {
-			console.error("Game over. Board is full.");
+			// Board is full. Game is over.
+			console.log("Board full, but also draw?");
+			events.emit("gameOver");
 		} else {
 			if (
 				// If the board has 3 of "x" as it will be the first to reach 3, to check for a winning pattern
@@ -138,16 +128,13 @@ const gameBoard = {
 				}).length >= 3
 			) {
 				if (this.hasWinningPattern(this.rows)) {
-					console.warn(this.hasWinningPattern(this.rows), "wins");
 					events.emit("gameOver");
 				} else if (this.hasWinningPattern(this.columns)) {
-					console.warn(this.hasWinningPattern(this.columns), "wins");
 					events.emit("gameOver");
 				} else if (this.hasWinningPattern(this.diagonals)) {
-					console.warn(this.hasWinningPattern(this.diagonals), "wins");
 					events.emit("gameOver");
 				} else {
-					console.info("No winning pattern yet...");
+					return;
 				}
 			}
 		}
@@ -185,12 +172,10 @@ const displayController = {
 		}
 		this.toggleButtonDisplayState(buttons.newGame);
 		this.makeBoardAvailable(true);
+		console.clear();
 	},
 	displayBoxInput: function (target) {
-		// console.log("Current ID of Box:", gameBoard.board[target.id]);
 		if (!target.parentNode.classList.contains("disabled") && !target.textContent) {
-			// console.log("Target is empty box:", target.textContent);
-			// console.log("Switching turn");
 			target.textContent = gameBoard.currentSymbol;
 			// Adjust board array with turns played
 			gameBoard.board[target.id] = gameBoard.currentSymbol;
@@ -226,7 +211,6 @@ const displayController = {
 		button.classList.toggle("d-none");
 	},
 	makeBoardAvailable: function (bool) {
-		console.log("makeboardavailable called");
 		if (bool === true) {
 			gameBoard.DOM.classList.remove("disabled");
 		} else {
@@ -290,7 +274,8 @@ buttons.init();
 // Computer Logic Module
 const computer = {
 	init: function () {
-		events.on("playerPlayed", this.playTurn.bind(this));
+		events.on("playerPlayed", computer.playTurn);
+		events.on("newGameClicked", this.turnOff.bind(this));
 	},
 	playTurn: function () {
 		// Only play turn if the symbol to be played is "o".
@@ -309,6 +294,9 @@ const computer = {
 			}
 			displayController.displayBoxInput(randomBox); // Sends automated and randomized computer input to display controller
 		}
+	},
+	turnOff: function () {
+		events.off("playerPlayed", computer.playTurn);
 	}
 };
 
