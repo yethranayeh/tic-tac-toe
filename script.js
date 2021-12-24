@@ -31,6 +31,8 @@ const gameBoard = {
 		this.board = this.createBoard();
 		this.DOM = document.querySelector(".game-board");
 		this.boxes = this.createBoxes();
+		this.gameMode = undefined;
+		this.currentSymbol = "x";
 		this.publishEvents();
 	},
 	createBoard: function () {
@@ -53,8 +55,20 @@ const gameBoard = {
 		this.boxes.forEach((box) => {
 			box.addEventListener("click", function (e) {
 				displayController.displayBoxInput(e.target);
+				events.emit("playerPlayed");
 			});
 		});
+	},
+	switchTurn: function () {
+		console.log(this.currentSymbol, "played...");
+		// let opponent;
+		// if (this.gameMode === "pvp") {
+		// 	opponent = "player2";
+		// } else if (this.gameMode === "pvpc") {
+		// 	opponent = "computer";
+		// }
+		this.currentSymbol = this.currentSymbol === "x" ? "o" : "x";
+		console.log("Next turn:", this.currentSymbol);
 	}
 };
 gameBoard.init();
@@ -82,10 +96,10 @@ const displayController = {
 		}
 	},
 	displayBoxInput: function (target) {
-		if (!target.parentNode.classList.contains("disabled")) {
-			let boxContent = document.createElement("p");
-			boxContent.textContent = "x";
-			target.appendChild(boxContent);
+		if (!target.parentNode.classList.contains("disabled") && !target.textContent) {
+			target.textContent = gameBoard.currentSymbol;
+			// Switch turn every time a box is clicked
+			gameBoard.switchTurn();
 		}
 	},
 	displayPlayer: function (player) {
@@ -111,6 +125,7 @@ const displayController = {
 		this.inputForm.querySelectorAll("input").forEach((input) => {
 			input.checked = false;
 		});
+		buttons.newGame.classList.add("d-none");
 	},
 	makeBoardAvailable: function (bool) {
 		if (bool === true) {
@@ -133,12 +148,17 @@ const playerInfo = {
 		events.on("gameModeChanged", this.gameModeHandler.bind(this));
 	},
 	gameModeHandler: function (input) {
+		let player;
+		let opponent;
 		if (input === "pvp") {
-			var player = playerFactory(prompt("Player 1 Name:"));
-			var opponent = playerFactory(prompt("Player 2 Name:"));
+			player = playerFactory(prompt("Player 1 Name:"));
+			opponent = playerFactory(prompt("Player 2 Name:"));
+			gameBoard.gameMode = "pvp";
 		} else if (input === "pvpc") {
-			var player = playerFactory(prompt("Player Name:"));
-			var opponent = playerFactory("Computer");
+			player = playerFactory(prompt("Player Name:"));
+			opponent = playerFactory("Computer");
+			gameBoard.gameMode = "pvpc";
+			computer.init();
 		}
 		displayController.getPlayerInput(input);
 		displayController.displayPlayer(player);
@@ -154,6 +174,7 @@ const playerInfo = {
 };
 playerInfo.init();
 
+// Buttons Module
 const buttons = {
 	init: function () {
 		this.publishEvents();
@@ -166,6 +187,24 @@ const buttons = {
 	}
 };
 buttons.init();
+
+// Computer Logic Module
+const computer = {
+	init: function () {
+		events.on("playerPlayed", this.playTurn.bind(this));
+	},
+	playTurn: function () {
+		emptyBox: for (let box of gameBoard.boxes) {
+			if (!box.textContent) {
+				// box.textContent = gameBoard.currentSymbol;
+				console.log("Sending box to be filled:", box);
+				displayController.displayBoxInput(box);
+				// gameBoard.switchTurn();
+				break emptyBox;
+			}
+		}
+	}
+};
 
 // Player Factory
 const playerFactory = (playerName) => {

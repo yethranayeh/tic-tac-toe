@@ -43,9 +43,12 @@ body {
 	min-height: 30vh;
 	display: flex;
 	flex-wrap: wrap;
-	color: var(--tictactoe-color);
-	font-size: 32px;
 	cursor: pointer;
+	font-family: "Oooh Baby", cursive;
+	font-size: 40px;
+	color: var(--tictactoe-color);
+	text-transform: uppercase;
+	text-shadow: 1px 1px 5px var(--primary-color);
 }
 
 .game-box {
@@ -74,14 +77,6 @@ body {
 .game-box:nth-child(6),
 .game-box:nth-child(9) {
 	border-right: none;
-}
-
-.game-box p {
-	font-family: "Oooh Baby", cursive;
-	text-transform: uppercase;
-	text-shadow: 1px 1px 5px var(--primary-color);
-	padding: 0;
-	margin: 0;
 }
 
 .new-game {
