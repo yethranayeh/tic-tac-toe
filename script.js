@@ -1,4 +1,7 @@
 /** @format */
+// BUG: Clicking on an already played box still registers as a "playerPlayed" event, which triggers a random response from computer.
+// As the click happens on an already played box, the content does not change. However, the gameBoard.currentSymbol changes, so the computer plays an "x"
+
 // PubSub by learncodeacademy
 const events = {
 	events: {},
@@ -44,10 +47,13 @@ const gameBoard = {
 	},
 	createBoxes: function () {
 		let boxes = [];
+		let boxID = 0;
 		this.board.forEach((content) => {
 			let gameBox = document.createElement("div");
 			gameBox.classList.add("game-box");
+			gameBox.id = boxID;
 			boxes.push(gameBox);
+			boxID++;
 		});
 		return boxes;
 	},
@@ -60,15 +66,9 @@ const gameBoard = {
 		});
 	},
 	switchTurn: function () {
-		console.log(this.currentSymbol, "played...");
-		// let opponent;
-		// if (this.gameMode === "pvp") {
-		// 	opponent = "player2";
-		// } else if (this.gameMode === "pvpc") {
-		// 	opponent = "computer";
-		// }
+		// console.log(this.currentSymbol, "played...");
 		this.currentSymbol = this.currentSymbol === "x" ? "o" : "x";
-		console.log("Next turn:", this.currentSymbol);
+		// console.log("Next turn:", this.currentSymbol);
 	}
 };
 gameBoard.init();
@@ -96,8 +96,11 @@ const displayController = {
 		}
 	},
 	displayBoxInput: function (target) {
+		// console.log("Current ID of Box:", gameBoard.board[target.id]);
 		if (!target.parentNode.classList.contains("disabled") && !target.textContent) {
 			target.textContent = gameBoard.currentSymbol;
+			// Adjust board array with turns played
+			gameBoard.board[target.id] = gameBoard.currentSymbol;
 			// Switch turn every time a box is clicked
 			gameBoard.switchTurn();
 		}
@@ -194,15 +197,17 @@ const computer = {
 		events.on("playerPlayed", this.playTurn.bind(this));
 	},
 	playTurn: function () {
-		emptyBox: for (let box of gameBoard.boxes) {
-			if (!box.textContent) {
-				// box.textContent = gameBoard.currentSymbol;
-				console.log("Sending box to be filled:", box);
-				displayController.displayBoxInput(box);
-				// gameBoard.switchTurn();
-				break emptyBox;
-			}
+		let randomBox = gameBoard.boxes[Math.floor(Math.random() * gameBoard.boxes.length)];
+		while (
+			!gameBoard.board.every((box) => {
+				// checks gameBoard.board to see that NOT every index has value. If all elements have truthy values, does not run
+				return box;
+			}) &&
+			randomBox.textContent // checks if target node has textContent. If it does, randomly chooses another node
+		) {
+			randomBox = gameBoard.boxes[Math.floor(Math.random() * gameBoard.boxes.length)];
 		}
+		displayController.displayBoxInput(randomBox); // Sends automated and randomized computer input to display controller
 	}
 };
 
