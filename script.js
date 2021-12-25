@@ -152,7 +152,7 @@ const displayController = {
 		events.on(
 			"gameOver",
 			function (result) {
-				console.warn("Game over result:", result);
+				this.displayResult(result);
 				this.toggleButtonDisplayState(buttons.newGame);
 			}.bind(this)
 		);
@@ -170,6 +170,7 @@ const displayController = {
 		}
 		this.toggleButtonDisplayState(buttons.newGame);
 		this.makeBoardAvailable(true);
+		this.gameStates[1].removeChild(this.gameStates[1].lastChild);
 		console.clear();
 	},
 	displayBoxInput: function (target) {
@@ -186,6 +187,29 @@ const displayController = {
 	},
 	displayOpponent: function (opponent) {
 		playerInfo.opponent.textContent = opponent ? opponent.playerName : "Computer";
+	},
+	displayResult: function (result) {
+		const winnerParagraph = document.createElement("p");
+		winnerParagraph.classList.add("game-result");
+		let gameResult;
+		if (result === "x") {
+			winnerParagraph.classList.add("win");
+			gameResult = `Winner is ${playerInfo.player.textContent}!`;
+		} else if (result === "o") {
+			if (playerInfo.opponent.textContent === "Computer") {
+				winnerParagraph.classList.add("lose");
+			} else {
+				winnerParagraph.classList.add("win");
+			}
+			gameResult = `Winner is ${playerInfo.opponent.textContent}!`;
+		} else if (result === "draw") {
+			winnerParagraph.classList.add("draw");
+			gameResult = "It's a draw!";
+		} else {
+			alert("Uncaught result:", result, "Please contact the developer.");
+		}
+		winnerParagraph.textContent = gameResult;
+		this.gameStates[1].appendChild(winnerParagraph);
 	},
 	getPlayerInput: function (input) {
 		if (input === "pvp" || input === "pvpc") {

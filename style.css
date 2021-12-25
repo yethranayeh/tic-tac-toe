@@ -57,6 +57,22 @@ body {
 	font-weight: 700;
 }
 
+.game-result {
+	font-size: 40px;
+}
+
+.game-result.win {
+	color: green;
+}
+
+.game-result.lose {
+	color: red;
+}
+
+.game-result.draw {
+	color: var(--tictactoe-color);
+}
+
 .game-board {
 	max-width: 40vw;
 	min-width: 30vw;
