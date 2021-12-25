@@ -247,10 +247,17 @@ const playerInfo = {
 	init: function () {
 		this.DOM = document.querySelector(".player-info");
 		this.player = this.DOM.querySelector("#player");
-		this.opponent = this.DOM.querySelector("#opponent");
-		this.gameModeInputs = this.DOM.querySelectorAll("input");
+		// this.opponent = this.DOM.querySelector("#opponent");
+		this.opponent = this.DOM.querySelector("#opponent1");
+		this.gameModeInputs = this.DOM.querySelectorAll("i");
 		this.publishEvents();
-		events.on("gameModeChanged", this.gameModeHandler.bind(this));
+		// events.on("gameModeChanged", this.gameModeHandler.bind(this));
+		events.on(
+			"gameModeChanged",
+			function (targetID) {
+				this.switchMode(targetID);
+			}.bind(this)
+		);
 	},
 	gameModeHandler: function (input) {
 		let player;
@@ -286,6 +293,17 @@ const playerInfo = {
 				events.emit("gameModeChanged", e.target.id);
 			});
 		});
+	},
+	switchMode: function (e) {
+		console.log(e);
+		let currentOpponent = this.opponent.textContent;
+		this.opponent.textContent = currentOpponent === "Computer" ? "Player 2" : "Computer";
+		if (this.opponent.textContent === "Player 2") {
+			this.opponent.setAttribute("contenteditable", "true");
+		} else {
+			this.opponent.setAttribute("contenteditable", "false");
+		}
+		this.opponent.classList.toggle("animate-text-editable");
 	}
 };
 playerInfo.init();
@@ -303,6 +321,9 @@ const buttons = {
 	}
 };
 buttons.init();
+
+let x = document.createElement("div");
+x.setAttribute(qualifiedName, value);
 
 // Computer Logic Module
 const computer = {
