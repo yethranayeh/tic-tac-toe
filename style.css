@@ -31,6 +31,67 @@ body {
 	text-align: center;
 }
 
+.player-container {
+	padding: 4px 0;
+	border: 1px solid var(--primary-color);
+	background-color: var(--light-color);
+	border-radius: 5px;
+}
+
+.player-container span {
+	padding: 0 3px;
+}
+
+.animate-text-editable {
+	animation-name: blinking-cursor;
+	animation-duration: 450ms;
+	animation-fill-mode: both;
+	animation-iteration-count: infinite;
+	animation-direction: alternate;
+	animation-timing-function: ease-out;
+}
+
+.player-container span:focus-visible {
+	animation-name: none;
+	outline: none;
+}
+
+@keyframes blinking-cursor {
+	from {
+		border-right: 2px solid rgba(0, 0, 0, 0);
+	}
+
+	to {
+		border-right: 2px solid var(--primary-color);
+	}
+}
+
+.switch-mode {
+	display: inline-block;
+	font-size: 28px;
+	margin: 0 15px 0;
+	cursor: pointer;
+	color: var(--secondary-color);
+	transition: transform 150ms ease-in;
+	vertical-align: text-bottom;
+}
+
+.switch-mode:hover {
+	color: var(--primary-color);
+}
+
+.switch-mode:nth-child(1):hover {
+	transform: translateX(-2px);
+}
+
+.switch-mode:nth-child(3):hover {
+	transform: translateX(2px);
+}
+
+.switch-mode:active {
+	color: var(--tictactoe-color);
+}
+
 .game-state p {
 	font-size: 24px;
 }
@@ -116,7 +177,7 @@ body {
 	border-right: none;
 }
 
-.new-game {
+.btn {
 	padding: 10px 15px;
 	margin-top: 40px;
 	border: 1px solid var(--secondary-color);
@@ -125,10 +186,16 @@ body {
 	transition: color 100ms ease-in, background-color 100ms ease-in, transform 150ms ease;
 }
 
-.new-game:hover {
+.btn:hover {
 	background-color: var(--secondary-color);
 	color: var(--bg);
 	transform: translateY(-3px);
+}
+
+.btn:active {
+	background-color: var(--primary-color);
+	color: var(--bg);
+	transform: translateY(1px);
 }
 
 /* Visibility */
