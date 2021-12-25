@@ -194,14 +194,14 @@ const displayController = {
 		let gameResult;
 		if (result === "x") {
 			winnerParagraph.classList.add("win");
-			gameResult = `Winner is ${playerInfo.player.textContent}!`;
+			gameResult = `${playerInfo.player.textContent} wins!`;
 		} else if (result === "o") {
 			if (playerInfo.opponent.textContent === "Computer") {
 				winnerParagraph.classList.add("lose");
 			} else {
 				winnerParagraph.classList.add("win");
 			}
-			gameResult = `Winner is ${playerInfo.opponent.textContent}!`;
+			gameResult = `${playerInfo.opponent.textContent} wins!`;
 		} else if (result === "draw") {
 			winnerParagraph.classList.add("draw");
 			gameResult = "It's a draw!";
