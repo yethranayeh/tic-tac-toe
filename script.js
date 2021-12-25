@@ -232,15 +232,26 @@ const playerInfo = {
 		let player;
 		let opponent;
 		if (input === "pvp") {
-			player = playerFactory(prompt("Player 1 Name:"));
-			opponent = playerFactory(prompt("Player 2 Name:"));
+			let playerInput = prompt("Player 1 name:");
+			playerInput = playerInput ? playerInput : "Player 1";
+			player = playerFactory(playerInput);
+
+			let opponentInput = prompt("Player 2 name:");
+			opponentInput = opponentInput ? opponentInput : "Player 2";
+			opponent = playerFactory(opponentInput);
+
 			gameBoard.gameMode = "pvp";
 		} else if (input === "pvpc") {
-			player = playerFactory(prompt("Player Name:"));
+			let playerInput = prompt("Player name:");
+			playerInput = playerInput ? playerInput : "Player";
+			player = playerFactory(playerInput);
+
 			opponent = playerFactory("Computer");
-			gameBoard.gameMode = "pvpc";
 			computer.init();
+
+			gameBoard.gameMode = "pvpc";
 		}
+
 		displayController.getPlayerInput(input);
 		displayController.displayPlayer(player);
 		displayController.displayOpponent(opponent);
