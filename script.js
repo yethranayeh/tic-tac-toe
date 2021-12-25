@@ -1,5 +1,4 @@
 /** @format */
-// TODO: Add logic for Draw condition. Currently there is a check in place for if the board is full, but it also fires when there's a winning pattern
 
 // PubSub by learncodeacademy
 const events = {
@@ -113,29 +112,27 @@ const gameBoard = {
 	},
 	checkGameState: function () {
 		if (
-			this.board.every((n) => {
-				return n === "x" || n === "o";
-			})
+			// If the board has 3 of "x" as it will be the first to reach 3, start checking for a winning pattern
+			this.board.filter((n) => {
+				return n === "x";
+			}).length >= 3
 		) {
-			// Board is full. Game is over.
-			console.log("Board full, but also draw?");
-			events.emit("gameOver");
-		} else {
-			if (
-				// If the board has 3 of "x" as it will be the first to reach 3, to check for a winning pattern
-				this.board.filter((n) => {
-					return n === "x";
-				}).length >= 3
+			// Check rows, columns, diagonals for winning pattern
+			if (this.hasWinningPattern(this.rows)) {
+				events.emit("gameOver", this.hasWinningPattern(this.rows));
+			} else if (this.hasWinningPattern(this.columns)) {
+				events.emit("gameOver", this.hasWinningPattern(this.columns));
+			} else if (this.hasWinningPattern(this.diagonals)) {
+				events.emit("gameOver", this.hasWinningPattern(this.diagonals));
+			} else if (
+				// If there is no winning pattern, check if the board is full. If so, it is a draw. If not, the game continues
+				this.board.every((n) => {
+					return n === "x" || n === "o";
+				})
 			) {
-				if (this.hasWinningPattern(this.rows)) {
-					events.emit("gameOver");
-				} else if (this.hasWinningPattern(this.columns)) {
-					events.emit("gameOver");
-				} else if (this.hasWinningPattern(this.diagonals)) {
-					events.emit("gameOver");
-				} else {
-					return;
-				}
+				events.emit("gameOver", "draw");
+			} else {
+				return;
 			}
 		}
 	}
@@ -154,7 +151,8 @@ const displayController = {
 		events.on("gameOver", this.makeBoardAvailable.bind(this));
 		events.on(
 			"gameOver",
-			function () {
+			function (result) {
+				console.warn("Game over result:", result);
 				this.toggleButtonDisplayState(buttons.newGame);
 			}.bind(this)
 		);
