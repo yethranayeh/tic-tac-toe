@@ -145,6 +145,8 @@ const displayController = {
 		this.gameStates = document.querySelectorAll(".game-state");
 		this.inputForm = document.querySelector("form");
 		this.initializeBoard();
+		events.on("startGameClicked", this.toggleInfoDisplayState.bind(this));
+		events.on("startGameClicked", this.makeBoardAvailable.bind(this));
 		events.on("newGameClicked", this.clearBoard.bind(this));
 		events.on("newGameClicked", this.toggleInfoDisplayState.bind(this));
 		events.on("newGameClicked", this.makeBoardAvailable.bind(this));
@@ -311,19 +313,20 @@ playerInfo.init();
 // Buttons Module
 const buttons = {
 	init: function () {
+		this.newGame = document.querySelector("#newGame");
+		this.startGame = document.querySelector("#startGame");
 		this.publishEvents();
 	},
-	newGame: document.querySelector("#newGame"),
 	publishEvents: function () {
 		this.newGame.addEventListener("click", function (e) {
 			events.emit("newGameClicked", e.target.id);
 		});
+		this.startGame.addEventListener("click", function (e) {
+			events.emit("startGameClicked", e.target.id);
+		});
 	}
 };
 buttons.init();
-
-let x = document.createElement("div");
-x.setAttribute(qualifiedName, value);
 
 // Computer Logic Module
 const computer = {
