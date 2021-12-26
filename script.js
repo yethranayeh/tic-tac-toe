@@ -143,9 +143,8 @@ gameBoard.init();
 const displayController = {
 	init: function () {
 		this.gameStates = document.querySelectorAll(".game-state");
-		this.inputForm = document.querySelector("form");
 		this.initializeBoard();
-		events.on("startGameClicked", this.toggleInfoDisplayState.bind(this));
+		// events.on("startGameClicked", this.toggleInfoDisplayState.bind(this));
 		events.on("startGameClicked", this.makeBoardAvailable.bind(this));
 		events.on("newGameClicked", this.clearBoard.bind(this));
 		events.on("newGameClicked", this.toggleInfoDisplayState.bind(this));
@@ -213,22 +212,26 @@ const displayController = {
 		winnerParagraph.textContent = gameResult;
 		this.gameStates[1].appendChild(winnerParagraph);
 	},
-	getGameMode: function (input) {
+	setGameMode: function (input) {
+		console.info("%csetGameMode", "color:aqua;font-style:italic;");
+		console.log("Input:", input);
 		if (input === "pvp" || input === "pvpc") {
+			console.log("Calling displayController.makeBoardAvailable%c(true)", "color:aqua;font-style:italic;");
+			console.log("Calling displayController.toggleInfoDisplayState()");
 			this.makeBoardAvailable(true);
 			this.toggleInfoDisplayState();
 		} else if (input === "newGame") {
+			console.log("Calling displayController.makeBoardAvailable%c(false)", "color:aqua;font-style:italic;");
+			console.log("Calling displayController.toggleInfoDisplayState()");
 			this.makeBoardAvailable(false);
 			this.toggleInfoDisplayState();
 		}
 	},
 	toggleInfoDisplayState: function () {
+		console.info("%ctoggleInfoDisplayState", "color:aqua;font-style:italic;");
 		this.gameStates.forEach((state) => {
+			console.log("Toggling 'd-none' for ->", state);
 			state.classList.toggle("d-none");
-		});
-		this.inputForm.classList.toggle("d-none");
-		this.inputForm.querySelectorAll("input").forEach((input) => {
-			input.checked = false;
 		});
 	},
 	toggleButtonDisplayState: function (button) {
@@ -263,17 +266,18 @@ const playerInfo = {
 		);
 	},
 	gameModeHandler: function () {
+		console.info("%cgameModeHandler", "color:aqua;font-style:italic;");
 		let gameMode;
 		const player = playerFactory(this.player.textContent);
 		const opponent = playerFactory(this.opponent.textContent);
-		console.info("Player:", player, "Opponent:", opponent);
+		console.log("Player:", player, "Opponent:", opponent);
 		if (!(opponent.playerName === "Computer")) {
 			player.playerName = player.playerName ? player.playerName : "Player 1";
 			opponent.playerName = opponent.playerName ? opponent.playerName : "Player 2";
 
 			gameMode = "pvp";
 			gameBoard.gameMode = "pvp";
-			console.warn("pvp", player.playerName, opponent.playerName, gameMode, gameBoard.gameMode);
+			console.warn(player.playerName, "vs", opponent.playerName, "in mode:", gameMode);
 		} else if (opponent.playerName === "Computer") {
 			player.playerName = player.playerName ? player.playerName : "Player";
 
@@ -281,14 +285,14 @@ const playerInfo = {
 
 			gameMode = "pvpc";
 			gameBoard.gameMode = "pvpc";
-			console.warn("pvpc", player.playerName, opponent.playerName, gameMode, gameBoard.gameMode);
+			console.warn(player.playerName, "vs", opponent.playerName, "in mode:", gameMode);
 		} else {
 			console.error("No conditions met");
 			console.info(`!opponent.playerName === "Computer" ->`, !opponent.playerName === "Computer");
 			console.info(`opponent.playerName === "Computer" ->`, opponent.playerName === "Computer");
 		}
 
-		displayController.getGameMode(gameMode);
+		displayController.setGameMode(gameMode);
 		displayController.displayPlayer(player);
 		displayController.displayOpponent(opponent);
 	},
@@ -301,7 +305,7 @@ const playerInfo = {
 	},
 	switchMode: function (e) {
 		console.log(e);
-		console.info("switchMode");
+		console.info("%cswitchMode", "color:aqua;font-style:italic;");
 		let currentOpponent = this.opponent.textContent;
 		this.opponent.textContent = currentOpponent === "Computer" ? "Player 2" : "Computer";
 		if (this.opponent.textContent === "Player 2") {

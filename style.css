@@ -98,7 +98,7 @@ body {
 	}
 
 	to {
-		border-right: 1px solid var(--primary-color);
+		border-right: 1px solid var(--tictactoe-color);
 	}
 }
 
