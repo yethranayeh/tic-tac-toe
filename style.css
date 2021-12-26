@@ -75,6 +75,14 @@ body {
 	transition: border 350ms ease-out, background-color 300ms ease-in, padding 450ms ease-out;
 }
 
+.player-container span {
+	padding: 3px 1px;
+	border-bottom: 2px solid rgba(0, 0, 0, 0);
+	border-bottom-left-radius: 5px;
+	border-bottom-right-radius: 5px;
+	transition: border-bottom 400ms ease;
+}
+
 .input-indicator {
 	padding: 6px 10px;
 	border: 1px solid var(--primary-color);
@@ -82,9 +90,9 @@ body {
 	/* border-radius: 5px; */
 }
 
-.input-indicator span {
+/* .input-indicator span {
 	padding: 0 1px;
-}
+} */
 
 .animate-text-editable {
 	animation-name: blinking-cursor;
@@ -111,7 +119,7 @@ body {
 }
 
 .turn-indicator {
-	border-bottom: 5px solid red;
+	border-bottom: 2px solid var(--tictactoe-color) !important;
 }
 
 .switch-mode {

@@ -152,7 +152,8 @@ const displayController = {
 				this.toggleButtonDisplayState(buttons.startGame);
 			}.bind(this)
 		);
-		events.on("startGameClicked", this.makeBoardAvailable.bind(this));
+		// events.on("startGameClicked", this.makeBoardAvailable.bind(this));
+		// events.on("startGameClicked", this.switchTurnIndicator.bind(this));
 		events.on("turnSwitched", this.switchTurnIndicator.bind(this));
 		events.on("newGameClicked", this.clearBoard.bind(this));
 		events.on("newGameClicked", this.toggleInfoDisplayState.bind(this));
@@ -284,20 +285,37 @@ const displayController = {
 		button.classList.toggle("d-none");
 	},
 	makeBoardAvailable: function (bool) {
+		console.info("%cmakeBoardAvailabe", "color:aqua;font-style:italic;");
 		if (bool === true) {
+			console.log("TRUE");
 			gameBoard.DOM.classList.remove("disabled");
+			this.switchTurnIndicator();
 		} else {
+			console.log("FALSE");
 			gameBoard.DOM.classList.add("disabled");
+			this.disableTurnIndicator();
 		}
 	},
 	switchTurnIndicator: function () {
-		if (gameBoard.currentSymbol === "x") {
-			playerInfo.player.classList.add("turn-indicator");
-			playerInfo.opponent.classList.remove("turn-indicator");
+		console.info("%cswitchTurnIndicator", "color:aqua;font-style:italic;");
+		if (!gameBoard.DOM.classList.contains("disabled")) {
+			console.log("Board not disabled");
+			if (gameBoard.currentSymbol === "x") {
+				playerInfo.player.classList.add("turn-indicator");
+				playerInfo.opponent.classList.remove("turn-indicator");
+			} else {
+				playerInfo.player.classList.remove("turn-indicator");
+				playerInfo.opponent.classList.add("turn-indicator");
+			}
 		} else {
-			playerInfo.player.classList.remove("turn-indicator");
-			playerInfo.opponent.classList.add("turn-indicator");
+			console.log("Board disabled");
+			this.disableTurnIndicator();
 		}
+	},
+	disableTurnIndicator: function () {
+		console.info("%cdisableTurnIndicator", "color:aqua;font-style:italic;");
+		playerInfo.player.classList.remove("turn-indicator");
+		playerInfo.opponent.classList.remove("turn-indicator");
 	}
 };
 displayController.init();
