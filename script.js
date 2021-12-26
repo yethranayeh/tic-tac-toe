@@ -213,7 +213,7 @@ const displayController = {
 		winnerParagraph.textContent = gameResult;
 		this.gameStates[1].appendChild(winnerParagraph);
 	},
-	getPlayerInput: function (input) {
+	getGameMode: function (input) {
 		if (input === "pvp" || input === "pvpc") {
 			this.makeBoardAvailable(true);
 			this.toggleInfoDisplayState();
@@ -248,12 +248,13 @@ displayController.init();
 const playerInfo = {
 	init: function () {
 		this.DOM = document.querySelector(".player-info");
-		this.player = this.DOM.querySelector("#player");
+		this.player = this.DOM.querySelector("#player1");
 		// this.opponent = this.DOM.querySelector("#opponent");
 		this.opponent = this.DOM.querySelector("#opponent1");
-		this.gameModeInputs = this.DOM.querySelectorAll("i");
+		this.modeSwitchBtns = this.DOM.querySelectorAll("i");
 		this.publishEvents();
 		// events.on("gameModeChanged", this.gameModeHandler.bind(this));
+		events.on("startGameClicked", this.gameModeHandler.bind(this));
 		events.on(
 			"gameModeChanged",
 			function (targetID) {
@@ -261,43 +262,46 @@ const playerInfo = {
 			}.bind(this)
 		);
 	},
-	gameModeHandler: function (input) {
-		let player;
-		let opponent;
-		if (input === "pvp") {
-			let playerInput = prompt("Player 1 name:");
-			playerInput = playerInput ? playerInput : "Player 1";
-			player = playerFactory(playerInput);
+	gameModeHandler: function () {
+		let gameMode;
+		const player = playerFactory(this.player.textContent);
+		const opponent = playerFactory(this.opponent.textContent);
+		console.info("Player:", player, "Opponent:", opponent);
+		if (!(opponent.playerName === "Computer")) {
+			player.playerName = player.playerName ? player.playerName : "Player 1";
+			opponent.playerName = opponent.playerName ? opponent.playerName : "Player 2";
 
-			let opponentInput = prompt("Player 2 name:");
-			opponentInput = opponentInput ? opponentInput : "Player 2";
-			opponent = playerFactory(opponentInput);
-
+			gameMode = "pvp";
 			gameBoard.gameMode = "pvp";
-		} else if (input === "pvpc") {
-			let playerInput = prompt("Player name:");
-			playerInput = playerInput ? playerInput : "Player";
-			player = playerFactory(playerInput);
+			console.warn("pvp", player.playerName, opponent.playerName, gameMode, gameBoard.gameMode);
+		} else if (opponent.playerName === "Computer") {
+			player.playerName = player.playerName ? player.playerName : "Player";
 
-			opponent = playerFactory("Computer");
 			computer.init();
 
+			gameMode = "pvpc";
 			gameBoard.gameMode = "pvpc";
+			console.warn("pvpc", player.playerName, opponent.playerName, gameMode, gameBoard.gameMode);
+		} else {
+			console.error("No conditions met");
+			console.info(`!opponent.playerName === "Computer" ->`, !opponent.playerName === "Computer");
+			console.info(`opponent.playerName === "Computer" ->`, opponent.playerName === "Computer");
 		}
 
-		displayController.getPlayerInput(input);
+		displayController.getGameMode(gameMode);
 		displayController.displayPlayer(player);
 		displayController.displayOpponent(opponent);
 	},
 	publishEvents: function () {
-		this.gameModeInputs.forEach((input) => {
-			input.addEventListener("click", function (e) {
+		this.modeSwitchBtns.forEach((btn) => {
+			btn.addEventListener("click", function (e) {
 				events.emit("gameModeChanged", e.target.id);
 			});
 		});
 	},
 	switchMode: function (e) {
 		console.log(e);
+		console.info("switchMode");
 		let currentOpponent = this.opponent.textContent;
 		this.opponent.textContent = currentOpponent === "Computer" ? "Player 2" : "Computer";
 		if (this.opponent.textContent === "Player 2") {

@@ -25,6 +25,9 @@ body {
 }
 
 .player-info {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
 	margin: 20px 0 40px;
 	font-family: var(--font-family);
 	font-weight: 400;
@@ -194,6 +197,7 @@ body {
 .btn {
 	padding: 10px 15px;
 	margin-top: 40px;
+	max-width: fit-content;
 	border: 1px solid var(--secondary-color);
 	color: var(--primary-color);
 	font-family: var(--font-family);
