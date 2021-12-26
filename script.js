@@ -143,11 +143,24 @@ gameBoard.init();
 const displayController = {
 	init: function () {
 		this.gameStates = document.querySelectorAll(".game-state");
+		this.nameContainers = document.querySelectorAll(".input-indicator");
 		this.initializeBoard();
 		// events.on("startGameClicked", this.toggleInfoDisplayState.bind(this));
+		events.on(
+			"startGameClicked",
+			function () {
+				this.toggleButtonDisplayState(buttons.startGame);
+			}.bind(this)
+		);
 		events.on("startGameClicked", this.makeBoardAvailable.bind(this));
 		events.on("newGameClicked", this.clearBoard.bind(this));
 		events.on("newGameClicked", this.toggleInfoDisplayState.bind(this));
+		events.on(
+			"newGameClicked",
+			function () {
+				this.toggleButtonDisplayState(buttons.startGame);
+			}.bind(this)
+		);
 		events.on("newGameClicked", this.makeBoardAvailable.bind(this));
 		events.on("gameOver", this.makeBoardAvailable.bind(this));
 		events.on(
@@ -227,11 +240,20 @@ const displayController = {
 			this.toggleInfoDisplayState();
 		}
 	},
-	toggleInfoDisplayState: function () {
+	toggleInfoDisplayState: function (eventPublisher) {
 		console.info("%ctoggleInfoDisplayState", "color:aqua;font-style:italic;");
-		this.gameStates.forEach((state) => {
-			console.log("Toggling 'd-none' for ->", state);
-			state.classList.toggle("d-none");
+		console.warn("Event publisher:", eventPublisher);
+		// this.gameStates.forEach((state) => {
+		// 	state.classList.toggle("d-none");
+		// });
+		console.log("Toggling 'd-none' for ->", this.gameStates[1]);
+		this.gameStates[1].classList.toggle("d-none");
+		this.nameContainers.forEach((container) => {
+			container.classList.toggle("input-indicator");
+		});
+
+		playerInfo.modeSwitchBtns.forEach((btn) => {
+			btn.classList.toggle("d-none");
 		});
 	},
 	toggleButtonDisplayState: function (button) {
@@ -251,9 +273,8 @@ displayController.init();
 const playerInfo = {
 	init: function () {
 		this.DOM = document.querySelector(".player-info");
-		this.player = this.DOM.querySelector("#player1");
-		// this.opponent = this.DOM.querySelector("#opponent");
-		this.opponent = this.DOM.querySelector("#opponent1");
+		this.player = this.DOM.querySelector("#player");
+		this.opponent = this.DOM.querySelector("#opponent");
 		this.modeSwitchBtns = this.DOM.querySelectorAll("i");
 		this.publishEvents();
 		// events.on("gameModeChanged", this.gameModeHandler.bind(this));
@@ -304,8 +325,8 @@ const playerInfo = {
 		});
 	},
 	switchMode: function (e) {
-		console.log(e);
 		console.info("%cswitchMode", "color:aqua;font-style:italic;");
+		console.log(e);
 		let currentOpponent = this.opponent.textContent;
 		this.opponent.textContent = currentOpponent === "Computer" ? "Player 2" : "Computer";
 		if (this.opponent.textContent === "Player 2") {

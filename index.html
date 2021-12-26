@@ -28,24 +28,20 @@
 		<div class="container">
 			<div class="player-info disable-select">
 				<div class="game-state">
-					<div class="player-container">
-						<span id="player1" class="animate-text-editable" contenteditable="true">Player</span>
+					<div class="input-indicator">
+						<span id="player" class="animate-text-editable" contenteditable="true">Player</span>
 					</div>
 					<div>
 						<span>VS</span>
 					</div>
-					<div class="player-container">
+					<div class="input-indicator">
 						<i id="btnLeft" class="fas fa-caret-left switch-mode"></i
-						><span id="opponent1" contenteditable="false">Computer</span
+						><span id="opponent" contenteditable="false">Computer</span
 						><i id="btnRight" class="fas fa-caret-right switch-mode"></i>
 					</div>
 				</div>
 
-				<div class="game-state d-none">
-					<span id="playerName"></span>
-					<span>vs</span>
-					<span id="opponentName"></span>
-				</div>
+				<div class="game-state d-none"></div>
 				<p id="startGame" class="btn game-state">Start Game</p>
 			</div>
 		</div>
