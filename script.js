@@ -153,6 +153,7 @@ const displayController = {
 			}.bind(this)
 		);
 		events.on("startGameClicked", this.makeBoardAvailable.bind(this));
+		events.on("turnSwitched", this.switchTurnIndicator.bind(this));
 		events.on("newGameClicked", this.clearBoard.bind(this));
 		events.on("newGameClicked", this.toggleInfoDisplayState.bind(this));
 		events.on(
@@ -189,6 +190,7 @@ const displayController = {
 	},
 	displayBoxInput: function (target) {
 		if (!target.parentNode.classList.contains("disabled") && !target.textContent) {
+			// Add symbol of current turn to the box
 			target.textContent = gameBoard.currentSymbol;
 			// Adjust board array with turns played
 			gameBoard.board[target.id] = gameBoard.currentSymbol;
@@ -286,6 +288,15 @@ const displayController = {
 			gameBoard.DOM.classList.remove("disabled");
 		} else {
 			gameBoard.DOM.classList.add("disabled");
+		}
+	},
+	switchTurnIndicator: function () {
+		if (gameBoard.currentSymbol === "x") {
+			playerInfo.player.classList.add("turn-indicator");
+			playerInfo.opponent.classList.remove("turn-indicator");
+		} else {
+			playerInfo.player.classList.remove("turn-indicator");
+			playerInfo.opponent.classList.add("turn-indicator");
 		}
 	}
 };
