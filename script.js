@@ -227,34 +227,56 @@ const displayController = {
 	},
 	setGameMode: function (input) {
 		console.info("%csetGameMode", "color:aqua;font-style:italic;");
-		console.log("Input:", input);
+		// console.log("Input:", input);
 		if (input === "pvp" || input === "pvpc") {
-			console.log("Calling displayController.makeBoardAvailable%c(true)", "color:aqua;font-style:italic;");
-			console.log("Calling displayController.toggleInfoDisplayState()");
+			// console.log("Calling displayController.makeBoardAvailable%c(true)", "color:aqua;font-style:italic;");
+			// console.log("Calling displayController.toggleInfoDisplayState()");
 			this.makeBoardAvailable(true);
 			this.toggleInfoDisplayState();
 		} else if (input === "newGame") {
-			console.log("Calling displayController.makeBoardAvailable%c(false)", "color:aqua;font-style:italic;");
-			console.log("Calling displayController.toggleInfoDisplayState()");
+			// console.log("Calling displayController.makeBoardAvailable%c(false)", "color:aqua;font-style:italic;");
+			// console.log("Calling displayController.toggleInfoDisplayState()");
 			this.makeBoardAvailable(false);
 			this.toggleInfoDisplayState();
 		}
 	},
 	toggleInfoDisplayState: function (eventPublisher) {
 		console.info("%ctoggleInfoDisplayState", "color:aqua;font-style:italic;");
-		console.warn("Event publisher:", eventPublisher);
-		// this.gameStates.forEach((state) => {
-		// 	state.classList.toggle("d-none");
-		// });
-		console.log("Toggling 'd-none' for ->", this.gameStates[1]);
-		this.gameStates[1].classList.toggle("d-none");
+
+		// console.log("Toggling 'd-none' for ->", this.gameStates[1]);
+		this.gameStates[1].classList.toggle("d-none"); // THIS IS PROBABLY UNNECESSARY. THE WINNER SHOULD HAVE A REVEALING ANIMATION, D-NONE IS TEMPORARY
+
+		// Toggle background color and border for container
 		this.nameContainers.forEach((container) => {
 			container.classList.toggle("input-indicator");
 		});
 
+		// Toggle the visibility of game mode switch buttons
 		playerInfo.modeSwitchBtns.forEach((btn) => {
 			btn.classList.toggle("d-none");
 		});
+
+		// Toggle the blinking cursor animations
+		// 	Player:
+		playerInfo.player.classList.toggle("animate-text-editable");
+		if (playerInfo.player.classList.contains("animate-text-editable")) {
+			playerInfo.player.setAttribute("contenteditable", "true");
+		} else {
+			playerInfo.player.setAttribute("contenteditable", "false");
+		}
+		//	Opponent:
+		if (playerInfo.editableInputs.length > 1) {
+			console.warn("Moren than 1 editable");
+			console.log("In this case, the animation would be toggled off.");
+			playerInfo.opponent.classList.remove("animate-text-editable");
+			playerInfo.opponent.setAttribute("contenteditable", "false");
+			playerInfo.editableInputs.splice(1, 1);
+		} else if (!(playerInfo.opponent.textContent === "Computer")) {
+			console.log("Opponent:", playerInfo.opponent);
+			playerInfo.opponent.classList.add("animate-text-editable");
+			playerInfo.opponent.setAttribute("contenteditable", "true");
+			playerInfo.editableInputs.push(playerInfo.opponent);
+		}
 	},
 	toggleButtonDisplayState: function (button) {
 		button.classList.toggle("d-none");
@@ -276,6 +298,7 @@ const playerInfo = {
 		this.player = this.DOM.querySelector("#player");
 		this.opponent = this.DOM.querySelector("#opponent");
 		this.modeSwitchBtns = this.DOM.querySelectorAll("i");
+		this.editableInputs = [this.player];
 		this.publishEvents();
 		// events.on("gameModeChanged", this.gameModeHandler.bind(this));
 		events.on("startGameClicked", this.gameModeHandler.bind(this));
@@ -291,14 +314,14 @@ const playerInfo = {
 		let gameMode;
 		const player = playerFactory(this.player.textContent);
 		const opponent = playerFactory(this.opponent.textContent);
-		console.log("Player:", player, "Opponent:", opponent);
+		// console.log("Player:", player, "Opponent:", opponent);
 		if (!(opponent.playerName === "Computer")) {
 			player.playerName = player.playerName ? player.playerName : "Player 1";
 			opponent.playerName = opponent.playerName ? opponent.playerName : "Player 2";
 
 			gameMode = "pvp";
 			gameBoard.gameMode = "pvp";
-			console.warn(player.playerName, "vs", opponent.playerName, "in mode:", gameMode);
+			// console.warn(player.playerName, "vs", opponent.playerName, "in mode:", gameMode);
 		} else if (opponent.playerName === "Computer") {
 			player.playerName = player.playerName ? player.playerName : "Player";
 
@@ -306,7 +329,7 @@ const playerInfo = {
 
 			gameMode = "pvpc";
 			gameBoard.gameMode = "pvpc";
-			console.warn(player.playerName, "vs", opponent.playerName, "in mode:", gameMode);
+			// console.warn(player.playerName, "vs", opponent.playerName, "in mode:", gameMode);
 		} else {
 			console.error("No conditions met");
 			console.info(`!opponent.playerName === "Computer" ->`, !opponent.playerName === "Computer");
@@ -326,13 +349,17 @@ const playerInfo = {
 	},
 	switchMode: function (e) {
 		console.info("%cswitchMode", "color:aqua;font-style:italic;");
-		console.log(e);
+		// console.log(e);
 		let currentOpponent = this.opponent.textContent;
 		this.opponent.textContent = currentOpponent === "Computer" ? "Player 2" : "Computer";
 		if (this.opponent.textContent === "Player 2") {
 			this.opponent.setAttribute("contenteditable", "true");
+			this.editableInputs.push(this.opponent);
+			// console.log("Editable inputs changed:", this.editableInputs);
 		} else {
 			this.opponent.setAttribute("contenteditable", "false");
+			this.editableInputs.splice(1, 1);
+			// console.log("Editable inputs changed:", this.editableInputs);
 		}
 		this.opponent.classList.toggle("animate-text-editable");
 	}
