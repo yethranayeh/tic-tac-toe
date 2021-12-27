@@ -420,6 +420,7 @@ const computer = {
 		events.on("newGameClicked", this.turnOff.bind(this));
 	},
 	playTurn: function () {
+		console.info("%cplayTurn", "color:aqua;font-style:italic;");
 		// Only play turn if the symbol to be played is "o".
 		// The if condition is a "bandaid" for the bug where player clicking on an already played box still gives the turn to computer, instead of playing for the next player input.
 		// As a result, you could click on, for example, the first box and the computer would play "x" or "o" symbols on empty boxes on each click.
@@ -434,7 +435,12 @@ const computer = {
 			) {
 				randomBox = gameBoard.boxes[Math.floor(Math.random() * gameBoard.boxes.length)];
 			}
-			displayController.displayBoxInput(randomBox); // Sends automated and randomized computer input to display controller
+			// Random computer play time to add artificial "thinking" time before playing turn
+			let min = 380;
+			let max = 580;
+			let computerPlayTime = Math.floor(min + Math.random() * (max + 1 - min));
+			setTimeout(displayController.displayBoxInput, computerPlayTime, randomBox); // Sends automated and randomized computer input to display controller after delay
+			// displayController.displayBoxInput(randomBox); // Sends automated and randomized computer input to display controller
 		}
 	},
 	turnOff: function () {
