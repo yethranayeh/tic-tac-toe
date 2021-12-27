@@ -87,12 +87,7 @@ body {
 	padding: 6px 10px;
 	border: 1px solid var(--primary-color);
 	background-color: var(--light-color);
-	/* border-radius: 5px; */
 }
-
-/* .input-indicator span {
-	padding: 0 1px;
-} */
 
 .animate-text-editable {
 	animation-name: blinking-cursor;
@@ -177,10 +172,11 @@ i {
 }
 
 .game-board {
-	max-width: 40vw;
+	/* max-width: 40vw;
 	min-width: 30vw;
 	max-width: 40vh;
-	min-height: 30vh;
+	min-height: 30vh; */
+	margin: 20px;
 	display: flex;
 	flex-wrap: wrap;
 	cursor: pointer;
@@ -192,8 +188,10 @@ i {
 }
 
 .game-box {
-	min-width: 50px;
-	min-height: 100px;
+	width: 1.3em;
+	height: 3em;
+	/* min-width: 50px;
+	min-height: 100px; */
 	flex: 0 0 33.333333%;
 	display: flex;
 	justify-content: center;
