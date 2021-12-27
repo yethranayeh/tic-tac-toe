@@ -39,6 +39,7 @@ body {
 	justify-content: space-evenly;
 	align-items: center;
 	gap: 15px;
+	transition: gap 300ms ease-out;
 }
 
 .game-state p {
@@ -62,9 +63,8 @@ body {
 	}
 }
 
-.game-state span {
-	font-size: 32px;
-	font-weight: 700;
+.game-state .versus {
+	font-size: 39px;
 }
 
 .player-container {
@@ -76,11 +76,18 @@ body {
 }
 
 .player-container span {
+	font-size: 32px;
 	padding: 3px 1px;
 	border-bottom: 2px solid rgba(0, 0, 0, 0);
 	border-bottom-left-radius: 5px;
 	border-bottom-right-radius: 5px;
 	transition: border-bottom 400ms ease;
+}
+
+.game-state .versus,
+.player-container span {
+	font-weight: 700;
+	transition: font-size 150ms ease-out;
 }
 
 .input-indicator {
@@ -124,7 +131,7 @@ i {
 
 .switch-mode {
 	display: inline-block;
-	font-size: 28px !important;
+	font-size: 28px;
 	cursor: pointer;
 	color: var(--secondary-color);
 	vertical-align: text-bottom;
@@ -185,6 +192,7 @@ i {
 	color: var(--tictactoe-color);
 	text-transform: uppercase;
 	text-shadow: 1px 1px 5px var(--primary-color);
+	transition: margin 300ms ease-out;
 }
 
 .game-box {
@@ -268,4 +276,25 @@ i {
 /* Disabled */
 .disabled {
 	cursor: not-allowed;
+}
+
+/* Responsive */
+@media screen and (max-width: 440px) {
+	.game-state {
+		flex-direction: column;
+		gap: 3px;
+	}
+
+	.game-board {
+		margin: 5px;
+	}
+
+	.game-state .versus,
+	.player-container span {
+		font-size: 24px;
+	}
+
+	.switch-mode {
+		font-size: 20px;
+	}
 }
