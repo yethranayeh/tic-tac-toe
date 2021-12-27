@@ -204,16 +204,16 @@ body {
 	display: flex;
 	flex-wrap: wrap;
 	cursor: pointer;
-	box-shadow: 7px 7px 8px 0px rgba(0, 0, 0, 0.7), -2px -2px 5px rgba(0, 0, 0, 0.1);
-	-webkit-box-shadow: 7px 7px 8px 0px rgba(0, 0, 0, 0.7), -2px -2px 5px rgba(0, 0, 0, 0.1);
-	-moz-box-shadow: 7px 7px 8px 0px rgba(0, 0, 0, 0.7), -2px -2px 5px rgba(0, 0, 0, 0.1);
+	box-shadow: 11px 13px 21px 1px rgba(0, 0, 0, 0.3);
+	-webkit-box-shadow: 11px 13px 21px 1px rgba(0, 0, 0, 0.3);
+	-moz-box-shadow: 11px 13px 21px 1px rgba(0, 0, 0, 0.3);
 	transition: margin 300ms ease-out, box-shadow 300ms ease-out;
 }
 
 .game-board.disabled {
-	box-shadow: 11px 13px 21px 1px rgba(0, 0, 0, 0.3);
-	-webkit-box-shadow: 11px 13px 21px 1px rgba(0, 0, 0, 0.3);
-	-moz-box-shadow: 11px 13px 21px 1px rgba(0, 0, 0, 0.3);
+	box-shadow: 7px 7px 8px 0px rgba(0, 0, 0, 0.7), -2px -2px 5px rgba(0, 0, 0, 0.1);
+	-webkit-box-shadow: 7px 7px 8px 0px rgba(0, 0, 0, 0.7), -2px -2px 5px rgba(0, 0, 0, 0.1);
+	-moz-box-shadow: 7px 7px 8px 0px rgba(0, 0, 0, 0.7), -2px -2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .game-box {
