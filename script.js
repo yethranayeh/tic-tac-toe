@@ -107,9 +107,9 @@ const gameBoard = {
 			});
 			// console.log(`%cResults: x(${x}) vs o(${o})`, "color: lightgreen; text-decoration: underline");
 			if (x === 3) {
-				return "x";
+				return ["x", element];
 			} else if (o === 3) {
-				return "o";
+				return ["o", element];
 			}
 		}
 		return false;
@@ -134,7 +134,7 @@ const gameBoard = {
 					return n === "x" || n === "o";
 				})
 			) {
-				events.emit("gameOver", "draw");
+				events.emit("gameOver", ["draw"]);
 			} else {
 				return;
 			}
@@ -167,12 +167,14 @@ const displayController = {
 				this.toggleButtonDisplayState(buttons.startGame);
 			}.bind(this)
 		);
+		events.on("newGameClicked", this.disableWinningHighlight.bind(this));
 		events.on("newGameClicked", this.makeBoardAvailable.bind(this));
 		events.on("gameOver", this.makeBoardAvailable.bind(this));
 		events.on(
 			"gameOver",
 			function (result) {
-				this.displayResult(result);
+				this.displayResult(result[0]);
+				this.highlightWinningPattern(result[1]);
 				this.toggleButtonDisplayState(buttons.newGame);
 			}.bind(this)
 		);
@@ -208,29 +210,6 @@ const displayController = {
 	},
 	displayOpponent: function (opponent) {
 		playerInfo.opponent.textContent = opponent ? opponent.playerName : "Computer";
-	},
-	displayResult: function (result) {
-		const winnerParagraph = document.createElement("p");
-		winnerParagraph.classList.add("game-result");
-		let gameResult;
-		if (result === "x") {
-			winnerParagraph.classList.add("win");
-			gameResult = `${playerInfo.player.textContent} wins!`;
-		} else if (result === "o") {
-			if (playerInfo.opponent.textContent === "Computer") {
-				winnerParagraph.classList.add("lose");
-			} else {
-				winnerParagraph.classList.add("win");
-			}
-			gameResult = `${playerInfo.opponent.textContent} wins!`;
-		} else if (result === "draw") {
-			winnerParagraph.classList.add("draw");
-			gameResult = "It's a draw!";
-		} else {
-			alert("Uncaught result:", result, "Please contact the developer.");
-		}
-		winnerParagraph.textContent = gameResult;
-		this.gameStates[1].appendChild(winnerParagraph);
 	},
 	setGameMode: function (input) {
 		console.info("%csetGameMode", "color:aqua;font-style:italic;");
@@ -273,13 +252,10 @@ const displayController = {
 		}
 		//	Opponent:
 		if (playerInfo.editableInputs.length > 1) {
-			console.warn("Moren than 1 editable");
-			console.log("In this case, the animation would be toggled off.");
 			playerInfo.opponent.classList.remove("animate-text-editable");
 			playerInfo.opponent.setAttribute("contenteditable", "false");
 			playerInfo.editableInputs.splice(1, 1);
 		} else if (!(playerInfo.opponent.textContent === "Computer")) {
-			console.log("Opponent:", playerInfo.opponent);
 			playerInfo.opponent.classList.add("animate-text-editable");
 			playerInfo.opponent.setAttribute("contenteditable", "true");
 			playerInfo.editableInputs.push(playerInfo.opponent);
@@ -291,11 +267,9 @@ const displayController = {
 	makeBoardAvailable: function (bool) {
 		console.info("%cmakeBoardAvailabe", "color:aqua;font-style:italic;");
 		if (bool === true) {
-			console.log("TRUE");
 			gameBoard.DOM.classList.remove("disabled");
 			this.switchTurnIndicator();
 		} else {
-			console.log("FALSE");
 			gameBoard.DOM.classList.add("disabled");
 			this.disableTurnIndicator();
 		}
@@ -320,6 +294,42 @@ const displayController = {
 		console.info("%cdisableTurnIndicator", "color:aqua;font-style:italic;");
 		playerInfo.player.classList.remove("turn-indicator");
 		playerInfo.opponent.classList.remove("turn-indicator");
+	},
+	displayResult: function (result) {
+		const winnerParagraph = document.createElement("p");
+		winnerParagraph.classList.add("game-result");
+		let gameResult;
+		if (result === "x") {
+			winnerParagraph.classList.add("win");
+			gameResult = `${playerInfo.player.textContent} wins!`;
+		} else if (result === "o") {
+			if (playerInfo.opponent.textContent === "Computer") {
+				winnerParagraph.classList.add("lose");
+			} else {
+				winnerParagraph.classList.add("win");
+			}
+			gameResult = `${playerInfo.opponent.textContent} wins!`;
+		} else if (result === "draw") {
+			winnerParagraph.classList.add("draw");
+			gameResult = "It's a draw!";
+		} else {
+			alert("Uncaught result:", result, "Please contact the developer.");
+		}
+		winnerParagraph.textContent = gameResult;
+		this.gameStates[1].appendChild(winnerParagraph);
+	},
+	highlightWinningPattern: function (pattern) {
+		if (pattern) {
+			pattern.forEach((index) => {
+				gameBoard.boxes[index].classList.add("winner-animation");
+			});
+		}
+	},
+	disableWinningHighlight: function () {
+		console.info("%cdisableWinningHighlight", "background-color: red; color: white; font-style: italic;");
+		gameBoard.DOM.querySelectorAll(".winner-animation").forEach((node) => {
+			node.classList.remove("winner-animation");
+		});
 	}
 };
 displayController.init();
@@ -333,7 +343,6 @@ const playerInfo = {
 		this.modeSwitchBtns = this.DOM.querySelectorAll("i");
 		this.editableInputs = [this.player];
 		this.publishEvents();
-		// events.on("gameModeChanged", this.gameModeHandler.bind(this));
 		events.on("startGameClicked", this.gameModeHandler.bind(this));
 		events.on(
 			"gameModeChanged",
