@@ -286,7 +286,7 @@ const displayController = {
 		}
 	},
 	toggleButtonDisplayState: function (button) {
-		button.classList.toggle("d-none");
+		button.classList.toggle("btn-disappear");
 	},
 	makeBoardAvailable: function (bool) {
 		console.info("%cmakeBoardAvailabe", "color:aqua;font-style:italic;");
