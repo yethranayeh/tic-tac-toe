@@ -187,7 +187,16 @@ i {
 	display: flex;
 	flex-wrap: wrap;
 	cursor: pointer;
-	transition: margin 300ms ease-out;
+	box-shadow: 7px 7px 8px 0px rgba(0, 0, 0, 0.7), -2px -2px 5px rgba(0, 0, 0, 0.1);
+	-webkit-box-shadow: 7px 7px 8px 0px rgba(0, 0, 0, 0.7), -2px -2px 5px rgba(0, 0, 0, 0.1);
+	-moz-box-shadow: 7px 7px 8px 0px rgba(0, 0, 0, 0.7), -2px -2px 5px rgba(0, 0, 0, 0.1);
+	transition: margin 300ms ease-out, box-shadow 300ms ease-out;
+}
+
+.game-board.disabled {
+	box-shadow: 11px 13px 21px 1px rgba(0, 0, 0, 0.3);
+	-webkit-box-shadow: 11px 13px 21px 1px rgba(0, 0, 0, 0.3);
+	-moz-box-shadow: 11px 13px 21px 1px rgba(0, 0, 0, 0.3);
 }
 
 .game-box {
@@ -210,8 +219,16 @@ i {
 	transition: background-color 100ms ease-in, border-color 250ms ease-out;
 }
 
+.disabled .game-box {
+	border-color: var(--light-color);
+}
+
 .game-box:hover {
 	background-color: var(--light-color);
+}
+
+.disabled .game-box:hover {
+	background-color: var(--bg);
 }
 
 .game-box:nth-child(7),
@@ -225,14 +242,6 @@ i {
 .game-box:nth-child(9) {
 	border-right: none;
 }
-
-/* .disabled .game-box {
-	border-color: var(--tictactoe-color);
-}
-
-.disabled .game-box:hover {
-	background-color: var(--bg);
-} */
 
 .winner-animation {
 	animation-name: winner-anim;
