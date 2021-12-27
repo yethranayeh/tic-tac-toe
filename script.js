@@ -60,8 +60,12 @@ const gameBoard = {
 	publishEvents: function () {
 		this.boxes.forEach((box) => {
 			box.addEventListener("click", function (e) {
-				displayController.displayBoxInput(e.target);
-				events.emit("playerPlayed");
+				// BUGFIX [f62a534] - The if coniditon solves an unintended bug introduced with artificial computer turn delay.
+				// The player was able to play multiple turns while waiting for the computer to play after the artificial delay.
+				if (gameBoard.gameMode === "pvp" || gameBoard.currentSymbol === "x") {
+					displayController.displayBoxInput(e.target);
+					events.emit("playerPlayed");
+				}
 			});
 		});
 	},

@@ -195,7 +195,7 @@ body {
 	align-items: center;
 	border-bottom: 1px solid var(--secondary-color);
 	border-right: 1px solid var(--secondary-color);
-	transition: background-color 100ms ease-in;
+	transition: background-color 100ms ease-in, border-color 250ms ease-out;
 }
 
 .game-box:hover {
@@ -213,6 +213,14 @@ body {
 .game-box:nth-child(9) {
 	border-right: none;
 }
+
+/* .disabled .game-box {
+	border-color: var(--tictactoe-color);
+}
+
+.disabled .game-box:hover {
+	background-color: var(--bg);
+} */
 
 .btn {
 	padding: 10px 15px;
