@@ -132,14 +132,14 @@ body {
 	border-bottom: 2px solid var(--tictactoe-color) !important;
 }
 
-i {
+.player-container i {
 	font-size: 0;
 	transition: font-size 250ms ease-out, margin-left 250ms ease-out, margin-right 250ms ease-out;
 }
 
 .switch-mode {
 	display: inline-block;
-	font-size: 28px;
+	font-size: 28px !important;
 	cursor: pointer;
 	color: var(--secondary-color);
 	vertical-align: text-bottom;
@@ -170,8 +170,17 @@ i {
 	color: var(--tictactoe-color);
 }
 
-.game-result {
-	font-size: 40px;
+.game-state.results {
+	margin-top: 25px;
+}
+
+.results {
+	font-size: 26px;
+	transition: font-size 250ms ease-out;
+}
+
+.results-none {
+	font-size: 0;
 }
 
 .game-result.win {
