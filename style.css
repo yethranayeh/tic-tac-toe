@@ -7,7 +7,8 @@
 	--light-color: #ccc5b9;
 	--light-secondary-color: #eeebe1;
 	--tictactoe-color: #eb5e28;
-	--font-family: "Play", sans-serif;
+	--font-page: "Play", sans-serif;
+	--font-board: "Oooh Baby", cursive;
 }
 
 *,
@@ -30,7 +31,7 @@ body {
 	flex-direction: column;
 	align-items: center;
 	margin: 20px 0 40px;
-	font-family: var(--font-family);
+	font-family: var(--font-page);
 	font-weight: 400;
 	text-align: center;
 }
@@ -65,7 +66,10 @@ body {
 }
 
 .game-state .versus {
+	margin: 0 10px 0;
 	font-size: 35px;
+	font-family: var(--font-board);
+	color: var(--tictactoe-color);
 	transition: font-size 150ms ease-out;
 }
 
@@ -212,7 +216,7 @@ i {
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	font-family: "Oooh Baby", cursive;
+	font-family: var(--font-board);
 	font-size: 40px;
 	color: var(--tictactoe-color);
 	text-transform: uppercase;
@@ -274,7 +278,7 @@ i {
 	border: 1px solid var(--secondary-color);
 	color: var(--primary-color);
 	background-color: var(--light-secondary-color);
-	font-family: var(--font-family);
+	font-family: var(--font-page);
 	transition: color 100ms ease-in, background-color 100ms ease-in, translate 150ms ease, transform 300ms ease-in-out;
 }
 
