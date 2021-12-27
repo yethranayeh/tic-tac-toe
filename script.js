@@ -260,7 +260,7 @@ const displayController = {
 
 		// Toggle the visibility of game mode switch buttons
 		playerInfo.modeSwitchBtns.forEach((btn) => {
-			btn.classList.toggle("d-none");
+			btn.classList.toggle("switch-mode");
 		});
 
 		// Toggle the blinking cursor animations

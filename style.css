@@ -122,13 +122,18 @@ body {
 	border-bottom: 2px solid var(--tictactoe-color) !important;
 }
 
+i {
+	font-size: 0;
+	transition: font-size 250ms ease-out, margin-left 250ms ease-out, margin-right 250ms ease-out;
+}
+
 .switch-mode {
 	display: inline-block;
-	font-size: 28px;
+	font-size: 28px !important;
 	cursor: pointer;
 	color: var(--secondary-color);
-	transition: transform 100ms ease-in, color 65ms ease-in;
 	vertical-align: text-bottom;
+	transition: transform 100ms ease-in, color 65ms ease-in;
 }
 
 .switch-mode:nth-child(1) {
