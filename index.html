@@ -15,31 +15,54 @@
 			href="https://fonts.googleapis.com/css2?family=Oooh+Baby&family=Play:wght@400;700&display=swap"
 			rel="stylesheet"
 		/>
+		<!-- Fontawesome -->
+		<link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+			integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ=="
+			crossorigin="anonymous"
+			referrerpolicy="no-referrer"
+		/>
+		<!-- Global site tag (gtag.js) - Google Analytics -->
+		<script async src="https://www.googletagmanager.com/gtag/js?id=G-53G6MNZZQV"></script>
+		<script>
+			window.dataLayer = window.dataLayer || [];
+			function gtag() {
+				dataLayer.push(arguments);
+			}
+			gtag("js", new Date());
+
+			gtag("config", "G-53G6MNZZQV");
+		</script>
 	</head>
 	<body>
 		<div class="container">
 			<div class="player-info disable-select">
 				<div class="game-state">
-					<p><span class="fading-arrows">↓</span> Please choose a game mode <span class="fading-arrows">↓</span></p>
+					<div class="player-container input-indicator">
+						<span id="player" class="animate-text-editable" contenteditable="true" spellcheck="false">Player</span>
+					</div>
+					<div class="versus">
+						<span>VS</span>
+					</div>
+					<div class="player-container input-indicator">
+						<i id="btnLeft" class="fas fa-caret-left switch-mode"></i
+						><span id="opponent" contenteditable="false" spellcheck="false">Computer</span
+						><i id="btnRight" class="fas fa-caret-right switch-mode"></i>
+					</div>
 				</div>
-				<div class="game-state d-none">
-					<span id="player">Player</span>
-					<span>vs</span>
-					<span id="opponent">Computer</span>
+
+				<div class="game-state results results-none">
+					<i id="resultIcon" class="fas"></i><span id="result">test</span>
 				</div>
-				<form action="">
-					<input type="radio" name="gameMode" id="pvpc" autocomplete="off" />
-					<label for="pvpc">Player vs Computer</label>
-					<input type="radio" name="gameMode" id="pvp" autocomplete="off" />
-					<label for="pvp">Player vs Player</label>
-				</form>
 			</div>
 		</div>
 		<div class="container">
 			<div class="game-board disable-select disabled"></div>
 		</div>
 		<div class="container">
-			<p id="newGame" class="new-game disable-select d-none">New Game</p>
+			<p id="startGame" class="btn disable-select">Start Game</p>
+			<p id="newGame" class="btn disable-select btn-disappear">New Game</p>
 		</div>
 		<script src="script.js"></script>
 	</body>

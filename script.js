@@ -29,7 +29,8 @@ const events = {
 // Game Board Module
 const gameBoard = {
 	init: function () {
-		this.board = this.createBoard();
+		// this.board is an array that is used to conveniently check the current game board state instead of interacting with the DOM
+		this.board = this.createBoard(); // an array of 9 "false" values, which will be changed to "X" or "O" depending on input
 		this.DOM = document.querySelector(".game-board");
 		this.boxes = this.createBoxes();
 		this.gameMode = undefined;
@@ -46,6 +47,7 @@ const gameBoard = {
 		return board;
 	},
 	createBoxes: function () {
+		// Create node elements before adding to gameBoard.DOM
 		let boxes = [];
 		let boxID = 0;
 		this.board.forEach((content) => {
@@ -60,12 +62,17 @@ const gameBoard = {
 	publishEvents: function () {
 		this.boxes.forEach((box) => {
 			box.addEventListener("click", function (e) {
-				displayController.displayBoxInput(e.target);
-				events.emit("playerPlayed");
+				// BUGFIX [f62a534] - The if coniditon solves an unintended bug introduced with artificial computer turn delay.
+				// The player was able to play multiple turns while waiting for the computer to play after the artificial delay.
+				if (gameBoard.gameMode === "pvp" || gameBoard.currentSymbol === "x") {
+					displayController.displayBoxInput(e.target);
+					events.emit("playerPlayed");
+				}
 			});
 		});
 	},
 	startFresh: function () {
+		// Restores the board to beginning state
 		this.board = this.createBoard();
 		this.gameMode = undefined;
 		this.currentSymbol = "x";
@@ -89,9 +96,10 @@ const gameBoard = {
 		[2, 4, 6]
 	],
 	hasWinningPattern: function (arr) {
+		// arr parameter received will be "rows", "columns" or "diagonals" arrays from gameBoard
 		// Check for winning pattern
 		for (let element of arr) {
-			// console.log(`%cChecking element: [${element}]`, "color: yellow; text-decoration: underline;");
+			// For each pattern, there is a counter for X and O. If the count of either is 3, that is a winning pattern.
 			let x = 0;
 			let o = 0;
 			element.forEach((index) => {
@@ -101,11 +109,11 @@ const gameBoard = {
 					o++;
 				}
 			});
-			// console.log(`%cResults: x(${x}) vs o(${o})`, "color: lightgreen; text-decoration: underline");
+
 			if (x === 3) {
-				return "x";
+				return ["x", element];
 			} else if (o === 3) {
-				return "o";
+				return ["o", element];
 			}
 		}
 		return false;
@@ -130,7 +138,7 @@ const gameBoard = {
 					return n === "x" || n === "o";
 				})
 			) {
-				events.emit("gameOver", "draw");
+				events.emit("gameOver", ["draw"]);
 			} else {
 				return;
 			}
@@ -143,16 +151,31 @@ gameBoard.init();
 const displayController = {
 	init: function () {
 		this.gameStates = document.querySelectorAll(".game-state");
-		this.inputForm = document.querySelector("form");
+		this.nameContainers = document.querySelectorAll(".input-indicator");
 		this.initializeBoard();
+		events.on(
+			"startGameClicked",
+			function () {
+				this.toggleButtonDisplayState(buttons.startGame);
+			}.bind(this)
+		);
+		events.on("turnSwitched", this.switchTurnIndicator.bind(this));
 		events.on("newGameClicked", this.clearBoard.bind(this));
 		events.on("newGameClicked", this.toggleInfoDisplayState.bind(this));
+		events.on(
+			"newGameClicked",
+			function () {
+				this.toggleButtonDisplayState(buttons.startGame);
+			}.bind(this)
+		);
+		events.on("newGameClicked", this.disableWinningHighlight.bind(this));
 		events.on("newGameClicked", this.makeBoardAvailable.bind(this));
 		events.on("gameOver", this.makeBoardAvailable.bind(this));
 		events.on(
 			"gameOver",
 			function (result) {
-				this.displayResult(result);
+				this.displayResult(result[0]);
+				this.highlightWinningPattern(result[1]);
 				this.toggleButtonDisplayState(buttons.newGame);
 			}.bind(this)
 		);
@@ -165,16 +188,24 @@ const displayController = {
 	clearBoard: function () {
 		for (let box of gameBoard.boxes) {
 			if (box.lastChild) {
+				// box.lastChild is the symbol placed on box (X or O). So, if the box contains a symbol, it will be cleared for next game
 				box.removeChild(box.lastChild);
 			}
 		}
+
 		this.toggleButtonDisplayState(buttons.newGame);
 		this.makeBoardAvailable(true);
-		this.gameStates[1].removeChild(this.gameStates[1].lastChild);
-		console.clear();
+
+		// After the board is cleared, also remove game result text
+		playerInfo.resultDOM.classList.add("results-none");
+		// After clearing the board, remove the current icon class for game result, so the appropriate one can be added next time
+		// Also remove game result classes from text so they can be re-added later
+		playerInfo.resultIcon.setAttribute("class", "fas");
+		playerInfo.resultText.setAttribute("class", "");
 	},
 	displayBoxInput: function (target) {
 		if (!target.parentNode.classList.contains("disabled") && !target.textContent) {
+			// Add symbol of current turn to the box
 			target.textContent = gameBoard.currentSymbol;
 			// Adjust board array with turns played
 			gameBoard.board[target.id] = gameBoard.currentSymbol;
@@ -188,30 +219,7 @@ const displayController = {
 	displayOpponent: function (opponent) {
 		playerInfo.opponent.textContent = opponent ? opponent.playerName : "Computer";
 	},
-	displayResult: function (result) {
-		const winnerParagraph = document.createElement("p");
-		winnerParagraph.classList.add("game-result");
-		let gameResult;
-		if (result === "x") {
-			winnerParagraph.classList.add("win");
-			gameResult = `${playerInfo.player.textContent} wins!`;
-		} else if (result === "o") {
-			if (playerInfo.opponent.textContent === "Computer") {
-				winnerParagraph.classList.add("lose");
-			} else {
-				winnerParagraph.classList.add("win");
-			}
-			gameResult = `${playerInfo.opponent.textContent} wins!`;
-		} else if (result === "draw") {
-			winnerParagraph.classList.add("draw");
-			gameResult = "It's a draw!";
-		} else {
-			alert("Uncaught result:", result, "Please contact the developer.");
-		}
-		winnerParagraph.textContent = gameResult;
-		this.gameStates[1].appendChild(winnerParagraph);
-	},
-	getPlayerInput: function (input) {
+	setGameMode: function (input) {
 		if (input === "pvp" || input === "pvpc") {
 			this.makeBoardAvailable(true);
 			this.toggleInfoDisplayState();
@@ -220,24 +228,113 @@ const displayController = {
 			this.toggleInfoDisplayState();
 		}
 	},
-	toggleInfoDisplayState: function () {
-		this.gameStates.forEach((state) => {
-			state.classList.toggle("d-none");
+	toggleInfoDisplayState: function (eventPublisher) {
+		// Toggle background color and border for container
+		this.nameContainers.forEach((container) => {
+			container.classList.toggle("input-indicator");
 		});
-		this.inputForm.classList.toggle("d-none");
-		this.inputForm.querySelectorAll("input").forEach((input) => {
-			input.checked = false;
+
+		// Toggle the visibility of game mode switch buttons
+		playerInfo.modeSwitchBtns.forEach((btn) => {
+			btn.classList.toggle("switch-mode");
 		});
+
+		// Toggle the blinking cursor animations and content editable attributes
+		// 	Player:
+		playerInfo.player.classList.toggle("animate-text-editable");
+		if (playerInfo.player.classList.contains("animate-text-editable")) {
+			playerInfo.player.setAttribute("contenteditable", "true");
+		} else {
+			playerInfo.player.setAttribute("contenteditable", "false");
+		}
+		//	Opponent:
+		// Since this is a toggle function, it checks the editableInputs array to see if there are more than 1 editable sections
+		if (playerInfo.editableInputs.length > 1) {
+			// More than 1 indicates that there is a player 2,
+			playerInfo.opponent.classList.remove("animate-text-editable");
+			playerInfo.opponent.setAttribute("contenteditable", "false");
+			// As this is a toggle, the reason this condition block is executed is because the user switched from Player 2 to Computer,
+			// So the second editable element is removed from array to indicate that the user wants Player vs Computer
+			playerInfo.editableInputs.splice(1, 1);
+		} else if (!(playerInfo.opponent.textContent === "Computer")) {
+			playerInfo.opponent.classList.add("animate-text-editable");
+			playerInfo.opponent.setAttribute("contenteditable", "true");
+			// This condition block executes when user switches from Computer to Player 2,
+			// As Player 2 allows name input, it is added to the editableInputs array
+			playerInfo.editableInputs.push(playerInfo.opponent);
+		}
 	},
 	toggleButtonDisplayState: function (button) {
-		button.classList.toggle("d-none");
+		button.classList.toggle("btn-disappear");
 	},
 	makeBoardAvailable: function (bool) {
+		// As the game starts, the board becomes clickable
 		if (bool === true) {
 			gameBoard.DOM.classList.remove("disabled");
+			this.switchTurnIndicator();
 		} else {
 			gameBoard.DOM.classList.add("disabled");
+			this.disableTurnIndicator();
 		}
+	},
+	switchTurnIndicator: function () {
+		// If board is NOT disabled, the game is on, so player turns should be displayed
+		if (!gameBoard.DOM.classList.contains("disabled")) {
+			// Depending on the current symbol, it basically switches it to the other
+			if (gameBoard.currentSymbol === "x") {
+				playerInfo.player.classList.add("turn-indicator");
+				playerInfo.opponent.classList.remove("turn-indicator");
+			} else {
+				playerInfo.player.classList.remove("turn-indicator");
+				playerInfo.opponent.classList.add("turn-indicator");
+			}
+		} else {
+			// If board is disabled, no turn to play, so turn visuals should not be displayed
+			this.disableTurnIndicator();
+		}
+	},
+	disableTurnIndicator: function () {
+		playerInfo.player.classList.remove("turn-indicator");
+		playerInfo.opponent.classList.remove("turn-indicator");
+	},
+	displayResult: function (result) {
+		// "results-none" is used to facilitate font-size animation, it is there when the results are not yet displayed
+		playerInfo.resultDOM.classList.remove("results-none");
+		// "game-result" class itself is useless, its purpose is to be used alongside "win", "lose", "draw". For example: "game-result win"
+		playerInfo.resultText.classList.add("game-result");
+		let gameResultText;
+		if (result === "x") {
+			playerInfo.resultText.classList.add("win");
+			gameResultText = `${playerInfo.player.textContent} wins!`;
+			playerInfo.resultIcon.classList.add("fa-trophy");
+		} else if (result === "o") {
+			if (playerInfo.opponent.textContent === "Computer") {
+				playerInfo.resultText.classList.add("lose");
+				playerInfo.resultIcon.classList.add("fa-heart-broken");
+			} else {
+				playerInfo.resultText.classList.add("win");
+				playerInfo.resultIcon.classList.add("fa-trophy");
+			}
+			gameResultText = `${playerInfo.opponent.textContent} wins!`;
+		} else if (result === "draw") {
+			playerInfo.resultText.classList.add("draw");
+			playerInfo.resultIcon.classList.add("fa-grip-lines");
+			gameResultText = "It's a draw!";
+		}
+		playerInfo.resultText.textContent = gameResultText;
+	},
+	highlightWinningPattern: function (pattern) {
+		// pattern parameter may be "undefined" because the result may be a draw, so when this is called, it will only run if there is a truthy pattern provided
+		if (pattern) {
+			pattern.forEach((index) => {
+				gameBoard.boxes[index].classList.add("winner-animation");
+			});
+		}
+	},
+	disableWinningHighlight: function () {
+		gameBoard.DOM.querySelectorAll(".winner-animation").forEach((node) => {
+			node.classList.remove("winner-animation");
+		});
 	}
 };
 displayController.init();
@@ -248,44 +345,63 @@ const playerInfo = {
 		this.DOM = document.querySelector(".player-info");
 		this.player = this.DOM.querySelector("#player");
 		this.opponent = this.DOM.querySelector("#opponent");
-		this.gameModeInputs = this.DOM.querySelectorAll("input");
+		this.modeSwitchBtns = this.DOM.querySelectorAll(".player-container i");
+		this.editableInputs = [this.player];
+		this.resultDOM = this.DOM.querySelector(".results");
+		this.resultIcon = this.DOM.querySelector("#resultIcon");
+		this.resultText = this.DOM.querySelector("#result");
 		this.publishEvents();
-		events.on("gameModeChanged", this.gameModeHandler.bind(this));
+		events.on("startGameClicked", this.gameModeHandler.bind(this));
+		events.on(
+			"gameModeChanged",
+			function (targetID) {
+				this.switchMode(targetID);
+			}.bind(this)
+		);
 	},
-	gameModeHandler: function (input) {
-		let player;
-		let opponent;
-		if (input === "pvp") {
-			let playerInput = prompt("Player 1 name:");
-			playerInput = playerInput ? playerInput : "Player 1";
-			player = playerFactory(playerInput);
+	gameModeHandler: function () {
+		let gameMode;
+		const player = playerFactory(this.player.textContent);
+		const opponent = playerFactory(this.opponent.textContent);
+		if (!(opponent.playerName === "Computer")) {
+			player.playerName = player.playerName ? player.playerName : "Player 1";
+			opponent.playerName = opponent.playerName ? opponent.playerName : "Player 2";
 
-			let opponentInput = prompt("Player 2 name:");
-			opponentInput = opponentInput ? opponentInput : "Player 2";
-			opponent = playerFactory(opponentInput);
-
+			gameMode = "pvp";
 			gameBoard.gameMode = "pvp";
-		} else if (input === "pvpc") {
-			let playerInput = prompt("Player name:");
-			playerInput = playerInput ? playerInput : "Player";
-			player = playerFactory(playerInput);
+		} else if (opponent.playerName === "Computer") {
+			player.playerName = player.playerName ? player.playerName : "Player";
 
-			opponent = playerFactory("Computer");
 			computer.init();
 
+			gameMode = "pvpc";
 			gameBoard.gameMode = "pvpc";
 		}
 
-		displayController.getPlayerInput(input);
+		displayController.setGameMode(gameMode);
 		displayController.displayPlayer(player);
 		displayController.displayOpponent(opponent);
 	},
 	publishEvents: function () {
-		this.gameModeInputs.forEach((input) => {
-			input.addEventListener("click", function (e) {
+		this.modeSwitchBtns.forEach((btn) => {
+			btn.addEventListener("click", function (e) {
 				events.emit("gameModeChanged", e.target.id);
 			});
 		});
+	},
+	switchMode: function () {
+		let currentOpponent = this.opponent.textContent;
+		this.opponent.textContent = currentOpponent === "Computer" ? "Player 2" : "Computer";
+		if (this.opponent.textContent === "Player 2") {
+			this.opponent.setAttribute("contenteditable", "true");
+			// If the current mode selection is Player 2, add it to editableInputs array
+			this.editableInputs.push(this.opponent);
+		} else {
+			this.opponent.setAttribute("contenteditable", "false");
+			// If the current mode is Computer, remove index 1 element from editableInputs array
+			this.editableInputs.splice(1, 1);
+		}
+		this.opponent.classList.toggle("animate-text-editable");
 	}
 };
 playerInfo.init();
@@ -293,12 +409,16 @@ playerInfo.init();
 // Buttons Module
 const buttons = {
 	init: function () {
+		this.newGame = document.querySelector("#newGame");
+		this.startGame = document.querySelector("#startGame");
 		this.publishEvents();
 	},
-	newGame: document.querySelector("#newGame"),
 	publishEvents: function () {
 		this.newGame.addEventListener("click", function (e) {
 			events.emit("newGameClicked", e.target.id);
+		});
+		this.startGame.addEventListener("click", function (e) {
+			events.emit("startGameClicked", e.target.id);
 		});
 	}
 };
@@ -325,7 +445,12 @@ const computer = {
 			) {
 				randomBox = gameBoard.boxes[Math.floor(Math.random() * gameBoard.boxes.length)];
 			}
-			displayController.displayBoxInput(randomBox); // Sends automated and randomized computer input to display controller
+			// Random computer play time to add artificial "thinking" time before playing turn
+			let min = 380;
+			let max = 580;
+			let computerPlayTime = Math.floor(min + Math.random() * (max + 1 - min));
+			setTimeout(displayController.displayBoxInput, computerPlayTime, randomBox); // Sends automated and randomized computer input to display controller after delay
+			// displayController.displayBoxInput(randomBox); // Sends automated and randomized computer input to display controller
 		}
 	},
 	turnOff: function () {
