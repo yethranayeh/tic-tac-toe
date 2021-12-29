@@ -150,9 +150,11 @@ gameBoard.init();
 // Display Controller Module
 const displayController = {
 	init: function () {
-		this.gameStates = document.querySelectorAll(".game-state");
-		this.nameContainers = document.querySelectorAll(".input-indicator");
+		this.bodyDOM = document.querySelector("body");
+		this.gameStates = this.bodyDOM.querySelectorAll(".game-state");
+		this.nameContainers = this.bodyDOM.querySelectorAll(".input-indicator");
 		this.initializeBoard();
+		events.on("themeChanged", this.changeTheme.bind(this));
 		events.on(
 			"startGameClicked",
 			function () {
@@ -179,6 +181,17 @@ const displayController = {
 				this.toggleButtonDisplayState(buttons.newGame);
 			}.bind(this)
 		);
+	},
+	changeTheme: function (target) {
+		if (target.classList.contains("fa-moon")) {
+			target.classList.remove("fa-moon");
+			target.classList.add("fa-sun");
+			this.bodyDOM.setAttribute("data-theme", "dark");
+		} else {
+			target.classList.add("fa-moon");
+			target.classList.remove("fa-sun");
+			this.bodyDOM.setAttribute("data-theme", "");
+		}
 	},
 	initializeBoard: function () {
 		for (let box of gameBoard.boxes) {
@@ -409,8 +422,11 @@ playerInfo.init();
 // Buttons Module
 const buttons = {
 	init: function () {
-		this.newGame = document.querySelector("#newGame");
-		this.startGame = document.querySelector("#startGame");
+		this.switchThemeBtn = document.querySelector(".theme i");
+		console.log(this.switchThemeBtn);
+		this.buttonsDOM = document.querySelector(".buttons");
+		this.newGame = this.buttonsDOM.querySelector("#newGame");
+		this.startGame = this.buttonsDOM.querySelector("#startGame");
 		this.publishEvents();
 	},
 	publishEvents: function () {
@@ -419,6 +435,9 @@ const buttons = {
 		});
 		this.startGame.addEventListener("click", function (e) {
 			events.emit("startGameClicked", e.target.id);
+		});
+		this.switchThemeBtn.addEventListener("click", function (e) {
+			events.emit("themeChanged", e.target);
 		});
 	}
 };
