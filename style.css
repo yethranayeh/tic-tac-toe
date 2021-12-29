@@ -327,6 +327,7 @@ body[data-theme="dark"] .container.theme i:hover {
 	color: var(--primary-color);
 	background-color: var(--light-secondary-color);
 	font-family: var(--font-page);
+	cursor: pointer;
 	transition: color 100ms ease-in, background-color 100ms ease-in, translate 150ms ease, transform 300ms ease-in-out;
 }
 
