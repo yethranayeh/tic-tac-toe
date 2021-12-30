@@ -154,6 +154,7 @@ const displayController = {
 		this.gameStates = this.bodyDOM.querySelectorAll(".game-state");
 		this.nameContainers = this.bodyDOM.querySelectorAll(".input-indicator");
 		this.initializeBoard();
+		this.initializeTheme();
 		events.on("themeChanged", this.changeTheme.bind(this));
 		events.on(
 			"startGameClicked",
@@ -182,15 +183,30 @@ const displayController = {
 			}.bind(this)
 		);
 	},
+	initializeTheme: function () {
+		let theme = localStorage.getItem("currentTheme");
+		if (theme) {
+			if (theme === "dark") {
+				let themeIcon = document.querySelector(".fa-moon");
+				this.bodyDOM.setAttribute("data-theme", "dark");
+				themeIcon.classList.remove("fa-moon");
+				themeIcon.classList.add("fa-sun");
+			}
+		} else {
+			localStorage.setItem("currentTheme", "light");
+		}
+	},
 	changeTheme: function (target) {
 		if (target.classList.contains("fa-moon")) {
 			target.classList.remove("fa-moon");
 			target.classList.add("fa-sun");
 			this.bodyDOM.setAttribute("data-theme", "dark");
+			localStorage.setItem("currentTheme", "dark");
 		} else {
 			target.classList.add("fa-moon");
 			target.classList.remove("fa-sun");
 			this.bodyDOM.setAttribute("data-theme", "");
+			localStorage.setItem("currentTheme", "light");
 		}
 	},
 	initializeBoard: function () {
@@ -423,7 +439,6 @@ playerInfo.init();
 const buttons = {
 	init: function () {
 		this.switchThemeBtn = document.querySelector(".theme i");
-		console.log(this.switchThemeBtn);
 		this.buttonsDOM = document.querySelector(".buttons");
 		this.newGame = this.buttonsDOM.querySelector("#newGame");
 		this.startGame = this.buttonsDOM.querySelector("#startGame");
